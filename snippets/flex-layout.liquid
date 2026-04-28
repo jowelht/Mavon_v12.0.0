@@ -1,0 +1,53 @@
+{%- doc -%}
+  Outputs flex layout CSS custom properties.
+  Called inside a style="" attribute by the parent snippet.
+
+  @param {object} settings - The settings object (section.settings or block.settings)
+{%- enddoc -%}
+
+{%- liquid
+  assign direction = settings.content_direction
+
+  if direction == 'row'
+    assign justify = settings.horizontal_alignment
+    if settings.align_baseline
+      assign align = 'baseline'
+    else
+      assign align = settings.vertical_alignment
+    endif
+  else
+    assign justify = settings.vertical_alignment_flex_direction_column
+    assign align = settings.horizontal_alignment_flex_direction_column
+  endif
+
+  assign mobile_direction = direction
+  if direction == 'row' and settings.vertical_on_mobile
+    assign mobile_direction = 'column'
+  endif
+-%}
+
+--flex-direction: {{ direction }};
+--flex-direction-mobile: {{ mobile_direction }};
+--justify-content: {{ justify }};
+--align-items: {{ align }};
+--content-text-align: {% if align == 'center' %}center{% elsif align == 'flex-end' %}right{% else %}left{% endif %};
+--column-gap: {{ settings.horizontal_gap }}px;
+--row-gap: {{ settings.vertical_gap }}px;
+
+{% stylesheet %}
+  .flex-container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: var(--flex-direction, column);
+    justify-content: var(--justify-content, flex-start);
+    align-items: var(--align-items, flex-start);
+    column-gap: var(--column-gap, 12px);
+    row-gap: var(--row-gap, 12px);
+  }
+
+  @media screen and (max-width: 749px) {
+    .flex-container {
+      flex-direction: var(--flex-direction-mobile, var(--flex-direction, column));
+    }
+  }
+{% endstylesheet %}

@@ -1,0 +1,35 @@
+{%- doc -%}
+  Outputs CSS custom properties for border, border-radius, and padding.
+  Called inside a style="" attribute by the parent snippet.
+
+  @param {object} settings - The settings object (section.settings or block.settings)
+{%- enddoc -%}
+
+{% if settings.border != 'none' %}
+--border-style: {{ settings.border }};
+--border-width: {{ settings.border_width }}px;
+--border-opacity: {{ settings.border_opacity | divided_by: 100.0 }};
+{% else %}
+--border-style: none;
+--border-width: 0;
+{% endif %}
+--border-radius: {{ settings.border_radius }}px;
+--padding-block-start: {{ settings.padding-block-start }}px;
+--padding-block-end: {{ settings.padding-block-end }}px;
+{% if settings.padding-inline-start != blank %}
+--padding-inline-start: {{ settings.padding-inline-start }}px;
+--padding-inline-end: {{ settings.padding-inline-end }}px;
+{% endif %}
+{% if settings.mobile_scale != blank %}
+--padding-mobile-scale: {{ settings.mobile_scale | divided_by: 100.0 }};
+{% endif %}
+
+{% stylesheet %}
+  .border-style {
+    border-style: var(--border-style, none);
+    border-width: var(--border-width, 0);
+    border-color: rgba(var(--color-foreground), var(--border-opacity, 1));
+    border-radius: var(--border-radius, 0);
+    overflow: hidden;
+  }
+{% endstylesheet %}

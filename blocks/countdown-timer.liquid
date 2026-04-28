@@ -1,0 +1,634 @@
+{% stylesheet %}
+  .countdown-block {
+    display: flex;
+    align-items: center;
+  }
+
+  .countdown-block .d-flex,
+  .countdown-block .countdown-timer-inner {
+    display: flex;
+    align-items: center;
+  }
+
+  .countdown-block .countdown__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .countdown-block .countdown__digit {
+    color: rgba(var(--color-foreground));
+  }
+
+  /* --- Boxed style --- */
+
+  .countdown-block--boxed .countdown-item {
+    padding: 0.3rem 0.7rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    position: relative;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.19);
+    min-width: 4.5rem;
+  }
+
+  .countdown-block--boxed .countdown-item + .countdown-item::before {
+    position: absolute;
+    content: ":";
+    left: calc(var(--countdown-gap, 1rem) / -2);
+    top: 50%;
+    font-size: 3rem;
+    transform: translate(-50%, -50%);
+    color: rgba(var(--color-foreground));
+  }
+
+  .countdown-block--boxed.rte .countdown__digit {
+    font-size: 1.6rem;
+    line-height: 2.5rem;
+  }
+
+  .countdown-block--boxed .countdown__labels {
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    line-height: 2rem;
+  }
+
+  .countdown-block--box-square .countdown-item {
+    border-radius: 0;
+  }
+
+  @media screen and (min-width: 750px) {
+    .countdown-block--boxed .countdown-item {
+      padding: 0.5rem 0.8rem;
+      min-width: 5rem;
+    }
+  }
+
+  @media screen and (min-width: 992px) {
+    .countdown-block--boxed .countdown-item {
+      padding: 0.8rem 1rem;
+      min-width: 8.5rem;
+    }
+    .countdown-block--boxed.rte .countdown__digit {
+      font-size: 2.4rem;
+    }
+    .countdown-block--boxed .countdown__labels {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media screen and (min-width: 1200px) {
+    .countdown-block--boxed .countdown-item {
+      padding: 0.6rem 1.2rem;
+      min-width: 8rem;
+    }
+    .countdown-block--boxed.rte .countdown__digit {
+      font-size: 2.6rem;
+    }
+    .countdown-block--boxed .countdown__labels {
+      font-size: 1.6rem;
+    }
+  }
+
+  /* --- Minimal style --- */
+
+  .countdown-block--minimal .countdown__inner {
+    gap: 0.5rem;
+  }
+
+  .countdown-block--minimal .countdown__digit {
+    position: relative;
+  }
+
+  .countdown-block--minimal.rte .countdown__digit {
+    font-size: 2rem;
+  }
+
+  .countdown-block--minimal .countdown__digit::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 0.1rem;
+    background: rgba(var(--color-foreground), 0.3);
+    inset-inline-start: 0;
+    bottom: -0.25rem;
+  }
+
+  /* --- Label text transform --- */
+  .countdown-block--label-uppercase .countdown__labels {
+    text-transform: uppercase;
+  }
+
+  /* --- Typography: custom preset only --- */
+  .custom-typography .countdown__digit {
+    font-size: var(--custom-font-size);
+    font-weight: var(--custom-font-weight);
+    line-height: var(--custom-line-height);
+    letter-spacing: var(--custom-letter-spacing);
+  }
+
+  /* Hide units and labels via CSS class */
+  .countdown-block--hide-days .countdown-item.Days { display: none; }
+  .countdown-block--hide-hours .countdown-item.Hrs { display: none; }
+  .countdown-block--hide-minutes .countdown-item.Min { display: none; }
+  .countdown-block--hide-seconds .countdown-item.Sec { display: none; }
+  .countdown-block--hide-labels .countdown__labels { display: none; }
+  .countdown-block--hide-separator .countdown-item + .countdown-item::before { display: none; }
+  .countdown-block--boxed:is(.h1,.h2, .h3,.h4,.h5,.h6) {
+    margin-block-end: 0;
+  }
+{% endstylesheet %}
+
+{%- liquid
+  assign timer_type = block.settings.timer_type
+  assign block_settings = block.settings
+  assign preset = block_settings.type_preset
+
+  # --- Fixed timer: build ISO 8601 string + validate ---
+  if timer_type == 'fixed'
+    assign minutes_padded = block.settings.countdown_minutes | prepend: '00' | slice: -2, 2
+    assign seconds_padded = block.settings.countdown_seconds | prepend: '00' | slice: -2, 2
+    assign countdown_datetime = block.settings.year | append: '-' | append: block.settings.countdown_month | append: '-' | append: block.settings.countdown_days | append: 'T' | append: block.settings.countdown_hours | append: ':' | append: minutes_padded | append: ':' | append: seconds_padded
+    assign countdown_timer_convert = countdown_datetime | date: '%s'
+    assign today_date = 'now' | date: '%s'
+
+    assign timer_active = false
+    if countdown_timer_convert > today_date
+      assign timer_active = true
+    endif
+  endif
+
+  # --- Evergreen timer: duration in milliseconds ---
+  assign evergreen_hours_ms = block.settings.evergreen_hours | times: 3600000
+  assign evergreen_minutes_ms = block.settings.evergreen_minutes | times: 60000
+  assign evergreen_ms = evergreen_hours_ms | plus: evergreen_minutes_ms
+
+  # --- Gap ---
+  assign gap_rem = block.settings.gap | times: 0.1
+
+  # --- Style classes ---
+  assign style = block.settings.style
+
+  # --- Unit visibility classes ---
+  assign hide_classes = ''
+  unless block.settings.show_days
+    assign hide_classes = hide_classes | append: ' countdown-block--hide-days'
+  endunless
+  unless block.settings.show_hours
+    assign hide_classes = hide_classes | append: ' countdown-block--hide-hours'
+  endunless
+  unless block.settings.show_minutes
+    assign hide_classes = hide_classes | append: ' countdown-block--hide-minutes'
+  endunless
+  unless block.settings.show_seconds
+    assign hide_classes = hide_classes | append: ' countdown-block--hide-seconds'
+  endunless
+  unless block.settings.show_labels
+    assign hide_classes = hide_classes | append: ' countdown-block--hide-labels'
+  endunless
+  unless block.settings.show_separator
+    assign hide_classes = hide_classes | append: ' countdown-block--hide-separator'
+  endunless
+-%}
+
+{%- capture inner_classes -%}countdown-block--{{ style }}{% if style == 'boxed' and block.settings.box_border_style == 'square' %} countdown-block--box-square{% endif %}{% if block.settings.label_text_style == 'uppercase' %} countdown-block--label-uppercase{% endif %} {{ preset }}{% if preset == 'custom' %} custom-typography{% endif %}{%- endcapture -%}
+
+{%- capture inner_style -%}gap: {{ gap_rem }}rem; --countdown-gap: {{ gap_rem }}rem;{% if preset == 'custom' %}{% render 'custom-typography-vars', settings: block_settings %}{% endif %}{%- endcapture -%}
+
+<div
+  class="countdown-block{{ hide_classes }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if timer_type == 'fixed' -%}
+    <countdown-timer>
+      {%- if timer_active -%}
+        <div
+          class="d-flex {{ inner_classes }}"
+          style="{{ inner_style }}"
+          data-countdown="{{ countdown_datetime }}"
+        >
+          <div class="countdown-item Days">
+            <div class="countdown__inner">
+              <span class="countdown__digit">- -</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.days' | t }}</span>
+            </div>
+          </div>
+          <div class="countdown-item Hrs">
+            <div class="countdown__inner">
+              <span class="countdown__digit">- -</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.hours' | t }}</span>
+            </div>
+          </div>
+          <div class="countdown-item Min">
+            <div class="countdown__inner">
+              <span class="countdown__digit">- -</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.minutes' | t }}</span>
+            </div>
+          </div>
+          <div class="countdown-item Sec">
+            <div class="countdown__inner">
+              <span class="countdown__digit">- -</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.seconds' | t }}</span>
+            </div>
+          </div>
+        </div>
+      {%- else -%}
+        <div class="d-flex {{ inner_classes }}" style="{{ inner_style }}">
+          <div class="countdown-item Days">
+            <div class="countdown__inner">
+              <span class="countdown__digit">00</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.days' | t }}</span>
+            </div>
+          </div>
+          <div class="countdown-item Hrs">
+            <div class="countdown__inner">
+              <span class="countdown__digit">00</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.hours' | t }}</span>
+            </div>
+          </div>
+          <div class="countdown-item Min">
+            <div class="countdown__inner">
+              <span class="countdown__digit">00</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.minutes' | t }}</span>
+            </div>
+          </div>
+          <div class="countdown-item Sec">
+            <div class="countdown__inner">
+              <span class="countdown__digit">00</span>
+              <span class="countdown__labels">{{ 'products.product.countdown_timer.seconds' | t }}</span>
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    </countdown-timer>
+  {%- else -%}
+    <script src="{{ 'countdown-timer-evergreen.js' | asset_url }}" defer></script>
+    <countdown-timer-evergreen
+      data-duration-ms="{{ evergreen_ms }}"
+      data-block-id="{{ block.id }}"
+      data-inner-classes="{{ inner_classes }}"
+      data-inner-style="{{ inner_style }}"
+    >
+      <div class="countdown-timer-inner"></div>
+    </countdown-timer-evergreen>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Countdown timer",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Timer"
+    },
+    {
+      "type": "select",
+      "id": "timer_type",
+      "label": "Timer type",
+      "options": [
+        { "value": "fixed", "label": "Fixed date" },
+        { "value": "evergreen", "label": "Evergreen" }
+      ],
+      "default": "fixed"
+    },
+    {
+      "type": "header",
+      "content": "Fixed timer",
+      "visible_if": "{{ block.settings.timer_type == 'fixed' }}"
+    },
+    {
+      "type": "number",
+      "id": "year",
+      "label": "Year",
+      "info": "Write the year in the following format: 2023",
+      "placeholder": "2023",
+      "visible_if": "{{ block.settings.timer_type == 'fixed' }}"
+    },
+    {
+      "type": "select",
+      "id": "countdown_month",
+      "label": "Month",
+      "options": [
+        { "value": "01", "label": "January" },
+        { "value": "02", "label": "February" },
+        { "value": "03", "label": "March" },
+        { "value": "04", "label": "April" },
+        { "value": "05", "label": "May" },
+        { "value": "06", "label": "June" },
+        { "value": "07", "label": "July" },
+        { "value": "08", "label": "August" },
+        { "value": "09", "label": "September" },
+        { "value": "10", "label": "October" },
+        { "value": "11", "label": "November" },
+        { "value": "12", "label": "December" }
+      ],
+      "default": "12",
+      "visible_if": "{{ block.settings.timer_type == 'fixed' }}"
+    },
+    {
+      "type": "select",
+      "id": "countdown_days",
+      "label": "Day",
+      "options": [
+        { "value": "01", "label": "1" },
+        { "value": "02", "label": "2" },
+        { "value": "03", "label": "3" },
+        { "value": "04", "label": "4" },
+        { "value": "05", "label": "5" },
+        { "value": "06", "label": "6" },
+        { "value": "07", "label": "7" },
+        { "value": "08", "label": "8" },
+        { "value": "09", "label": "9" },
+        { "value": "10", "label": "10" },
+        { "value": "11", "label": "11" },
+        { "value": "12", "label": "12" },
+        { "value": "13", "label": "13" },
+        { "value": "14", "label": "14" },
+        { "value": "15", "label": "15" },
+        { "value": "16", "label": "16" },
+        { "value": "17", "label": "17" },
+        { "value": "18", "label": "18" },
+        { "value": "19", "label": "19" },
+        { "value": "20", "label": "20" },
+        { "value": "21", "label": "21" },
+        { "value": "22", "label": "22" },
+        { "value": "23", "label": "23" },
+        { "value": "24", "label": "24" },
+        { "value": "25", "label": "25" },
+        { "value": "26", "label": "26" },
+        { "value": "27", "label": "27" },
+        { "value": "28", "label": "28" },
+        { "value": "29", "label": "29" },
+        { "value": "30", "label": "30" },
+        { "value": "31", "label": "31" }
+      ],
+      "default": "31",
+      "visible_if": "{{ block.settings.timer_type == 'fixed' }}"
+    },
+    {
+      "type": "select",
+      "id": "countdown_hours",
+      "label": "Hour",
+      "info": "24-hour format",
+      "options": [
+        { "value": "00", "label": "00 (12 AM)" },
+        { "value": "01", "label": "01 (1 AM)" },
+        { "value": "02", "label": "02 (2 AM)" },
+        { "value": "03", "label": "03 (3 AM)" },
+        { "value": "04", "label": "04 (4 AM)" },
+        { "value": "05", "label": "05 (5 AM)" },
+        { "value": "06", "label": "06 (6 AM)" },
+        { "value": "07", "label": "07 (7 AM)" },
+        { "value": "08", "label": "08 (8 AM)" },
+        { "value": "09", "label": "09 (9 AM)" },
+        { "value": "10", "label": "10 (10 AM)" },
+        { "value": "11", "label": "11 (11 AM)" },
+        { "value": "12", "label": "12 (12 PM)" },
+        { "value": "13", "label": "13 (1 PM)" },
+        { "value": "14", "label": "14 (2 PM)" },
+        { "value": "15", "label": "15 (3 PM)" },
+        { "value": "16", "label": "16 (4 PM)" },
+        { "value": "17", "label": "17 (5 PM)" },
+        { "value": "18", "label": "18 (6 PM)" },
+        { "value": "19", "label": "19 (7 PM)" },
+        { "value": "20", "label": "20 (8 PM)" },
+        { "value": "21", "label": "21 (9 PM)" },
+        { "value": "22", "label": "22 (10 PM)" },
+        { "value": "23", "label": "23 (11 PM)" }
+      ],
+      "default": "00",
+      "visible_if": "{{ block.settings.timer_type == 'fixed' }}"
+    },
+    {
+      "type": "range",
+      "id": "countdown_minutes",
+      "label": "Minute",
+      "min": 0,
+      "max": 59,
+      "step": 1,
+      "unit": "min",
+      "default": 0,
+      "visible_if": "{{ block.settings.timer_type == 'fixed' }}"
+    },
+    {
+      "type": "range",
+      "id": "countdown_seconds",
+      "label": "Second",
+      "min": 0,
+      "max": 59,
+      "step": 1,
+      "unit": "sec",
+      "default": 0,
+      "visible_if": "{{ block.settings.timer_type == 'fixed' }}"
+    },
+    {
+      "type": "header",
+      "content": "Evergreen timer",
+      "visible_if": "{{ block.settings.timer_type == 'evergreen' }}"
+    },
+    {
+      "type": "range",
+      "id": "evergreen_hours",
+      "label": "Hours",
+      "min": 0,
+      "max": 72,
+      "step": 1,
+      "default": 2,
+      "visible_if": "{{ block.settings.timer_type == 'evergreen' }}"
+    },
+    {
+      "type": "range",
+      "id": "evergreen_minutes",
+      "label": "Minutes",
+      "min": 0,
+      "max": 59,
+      "step": 1,
+      "default": 0,
+      "visible_if": "{{ block.settings.timer_type == 'evergreen' }}"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        { "value": "boxed", "label": "Boxed" },
+        { "value": "minimal", "label": "Minimal" }
+      ],
+      "default": "boxed"
+    },
+    {
+      "type": "select",
+      "id": "box_border_style",
+      "label": "Box border style",
+      "options": [
+        { "value": "round", "label": "Round" },
+        { "value": "square", "label": "Square" }
+      ],
+      "default": "round",
+      "visible_if": "{{ block.settings.style == 'boxed' }}"
+    },
+    {
+      "type": "select",
+      "id": "label_text_style",
+      "label": "Label text transform",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "uppercase", "label": "Uppercase" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_labels",
+      "label": "Show labels",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separator",
+      "label": "Show separator",
+      "default": true,
+      "visible_if": "{{ block.settings.style == 'boxed' }}"
+    },
+    {
+      "type": "header",
+      "content": "Unit visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_days",
+      "label": "Show days",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hours",
+      "label": "Show hours",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_minutes",
+      "label": "Show minutes",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_seconds",
+      "label": "Show seconds",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between items",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "t:content.typography"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:settings.preset",
+      "options": [
+        { "value": "rte", "label": "t:options.default" },
+        { "value": "h1", "label": "t:options.h1" },
+        { "value": "h2", "label": "t:options.h2" },
+        { "value": "h3", "label": "t:options.h3" },
+        { "value": "h4", "label": "t:options.h4" },
+        { "value": "h5", "label": "t:options.h5" },
+        { "value": "h6", "label": "t:options.h6" },
+        { "value": "custom", "label": "t:options.custom" }
+      ],
+      "default": "h2",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:settings.font",
+      "options": [
+        { "value": "body", "label": "t:options.body" },
+        { "value": "heading", "label": "t:options.heading" },
+        { "value": "accent", "label": "t:options.accent" },
+        { "value": "display", "label": "Display" }
+      ],
+      "default": "heading",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:settings.size",
+      "options": [
+        { "value": "", "label": "t:options.default" },
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" },
+        { "value": "1.125rem", "label": "18px" },
+        { "value": "1.25rem", "label": "20px" },
+        { "value": "1.5rem", "label": "24px" },
+        { "value": "2rem", "label": "32px" },
+        { "value": "2.5rem", "label": "40px" },
+        { "value": "3rem", "label": "48px" },
+        { "value": "3.5rem", "label": "56px" },
+        { "value": "4.5rem", "label": "72px" },
+        { "value": "5.5rem", "label": "88px" },
+        { "value": "7.5rem", "label": "120px" },
+        { "value": "9.5rem", "label": "152px" },
+        { "value": "11.5rem", "label": "184px" }
+      ],
+      "default": "2rem",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "t:settings.line_height",
+      "options": [
+        { "value": "tight", "label": "t:options.tight" },
+        { "value": "normal", "label": "t:options.normal" },
+        { "value": "loose", "label": "t:options.loose" }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:settings.letter_spacing",
+      "options": [
+        { "value": "tight", "label": "t:options.tight" },
+        { "value": "normal", "label": "t:options.normal" },
+        { "value": "loose", "label": "t:options.loose" }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown timer",
+      "category": "Basic"
+    }
+  ]
+}
+{% endschema %}

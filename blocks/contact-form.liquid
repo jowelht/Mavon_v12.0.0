@@ -1,0 +1,552 @@
+{% stylesheet %}
+  /* =========================================
+     CONTACT FORM BLOCK — BASE
+     ========================================= */
+  .contact-form-block {
+    width: var(--cf-block-width, 100%);
+    padding-top: var(--cf-padding-top, 0);
+    padding-bottom: var(--cf-padding-bottom, 0);
+    padding-left: var(--cf-padding-left, 0);
+    padding-right: var(--cf-padding-right, 0);
+  }
+
+  /* =========================================
+     FORM GRID — Half-width fields side by side
+     ========================================= */
+  .contact-form-block__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .contact-form-block__field {
+    min-width: 0;
+  }
+
+  .contact-form-block__field--full {
+    width: 100%;
+  }
+
+  .contact-form-block__field--half {
+    width: calc(50% - 0.75rem);
+  }
+
+  /* =========================================
+     INPUT STYLES — Shared across all inputs
+     ========================================= */
+  .contact-form-block .cf-input,
+  .contact-form-block .cf-textarea,
+  .contact-form-block .cf-select {
+    width: 100%;
+    height: 5rem;
+    padding: 0 1.5rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: rgba(var(--color-foreground));
+    background-color: transparent;
+    margin-bottom: 0;
+  }
+
+  .contact-form-block .cf-textarea {
+    height: auto;
+    padding: 1.5rem;
+    min-height: 12rem;
+    resize: vertical;
+  }
+
+  .contact-form-block .cf-select {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 4rem;
+  }
+
+  .contact-form-block__select-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .contact-form-block__select-arrow {
+    position: absolute;
+    right: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    color: rgba(var(--color-foreground), 0.55);
+  }
+
+  .contact-form-block__select-arrow svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  /* ---- Placeholder ---- */
+  .contact-form-block .cf-input::placeholder,
+  .contact-form-block .cf-textarea::placeholder {
+    color: rgba(var(--color-foreground), 0.55);
+  }
+
+  /* ---- Focus ---- */
+  .contact-form-block .cf-input:focus,
+  .contact-form-block .cf-textarea:focus,
+  .contact-form-block .cf-select:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: rgba(var(--color-foreground));
+  }
+
+  /* =========================================
+     FIELD BORDER STYLES
+     Parent class controls child field borders
+     ========================================= */
+
+  /* Box — borders on all sides */
+  .contact-form-block--border-box .cf-input,
+  .contact-form-block--border-box .cf-textarea,
+  .contact-form-block--border-box .cf-select {
+    border: 1px solid rgba(var(--color-foreground), 0.15);
+    border-radius: var(--cf-field-radius, 0);
+  }
+
+  /* Underline — only bottom border */
+  .contact-form-block--border-underline .cf-input,
+  .contact-form-block--border-underline .cf-textarea,
+  .contact-form-block--border-underline .cf-select {
+    border: none;
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.15);
+    border-radius: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* None — no border, parent color settings provide background/text */
+  .contact-form-block--border-none .cf-input,
+  .contact-form-block--border-none .cf-textarea,
+  .contact-form-block--border-none .cf-select {
+    border: none;
+    border-radius: 0.8rem;
+    background-color: var(--cf-field-bg, #F5F5F5);
+    color: var(--cf-field-text, inherit);
+  }
+
+  .contact-form-block--border-none .cf-input::placeholder,
+  .contact-form-block--border-none .cf-textarea::placeholder {
+    color: var(--cf-field-text, inherit);
+    opacity: 0.55;
+  }
+
+  /* =========================================
+     LABEL STYLES
+     ========================================= */
+  .contact-form-block__label {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: rgba(var(--color-foreground), 0.7);
+  }
+
+  .contact-form-block__label--required::after {
+    content: " *";
+    color: rgba(var(--color-foreground), 0.5);
+  }
+
+  /* =========================================
+     RADIO & CHECKBOX GROUPS
+     ========================================= */
+  .contact-form-block__option-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 0.5rem;
+  }
+
+  .contact-form-block__option-group--vertical {
+    flex-direction: column;
+  }
+
+  .contact-form-block__option-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+
+  .contact-form-block__option-item input[type="radio"],
+  .contact-form-block__option-item input[type="checkbox"] {
+    width: 1.6rem;
+    height: 1.6rem;
+    accent-color: rgb(var(--color-foreground));
+    cursor: pointer;
+  }
+
+  /* =========================================
+     SUBMIT BUTTON
+     ========================================= */
+  .contact-form-block__submit {
+    margin-top: 2rem;
+  }
+
+  .contact-form-block .contact-form-block__submit--full button {
+    width: 100%;
+  }
+
+  /* =========================================
+     MESSAGES (Success / Error)
+     ========================================= */
+  .contact-form-block .cf-message {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* =========================================
+     MOBILE RESPONSIVE
+     ========================================= */
+  @media screen and (max-width: 749px) {
+    .contact-form-block {
+      width: var(--cf-block-width-mobile, var(--cf-block-width, 100%));
+      padding-top: calc(var(--cf-padding-top, 0) * var(--cf-mobile-scale, 1));
+      padding-bottom: calc(var(--cf-padding-bottom, 0) * var(--cf-mobile-scale, 1));
+      padding-left: calc(var(--cf-padding-left, 0) * var(--cf-mobile-scale, 1));
+      padding-right: calc(var(--cf-padding-right, 0) * var(--cf-mobile-scale, 1));
+    }
+
+    /* Half-width fields stack on mobile */
+    .contact-form-block__field--half {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{%- liquid
+  # ---- Dimensions ----
+  case block.settings.width
+    when 'custom'
+      assign width_value = block.settings.width_custom | append: '%'
+    else
+      assign width_value = '100%'
+  endcase
+
+  case block.settings.width_mobile
+    when 'custom'
+      assign width_mobile_value = block.settings.width_mobile_custom | append: '%'
+    else
+      assign width_mobile_value = '100%'
+  endcase
+
+  # ---- Padding ----
+  assign pt_rem = block.settings.padding_top | times: 0.1
+  assign pb_rem = block.settings.padding_bottom | times: 0.1
+  assign pl_rem = block.settings.padding_left | times: 0.1
+  assign pr_rem = block.settings.padding_right | times: 0.1
+  assign mobile_scale = block.settings.mobile_scale | divided_by: 100.0
+
+  # ---- Field style ----
+  assign border_style = block.settings.field_border_style
+  assign border_radius_rem = block.settings.field_border_radius | times: 0.1
+
+  # ---- Button ----
+  case block.settings.button_style
+    when 'primary'
+      assign button_class = 'button button--medium'
+    when 'secondary'
+      assign button_class = 'button button--secondary'
+    else
+      assign button_class = 'link'
+  endcase
+-%}
+
+{%- capture fields -%}
+  {% content_for 'blocks' %}
+{%- endcapture -%}
+
+<div
+  class="contact-form-block contact-form-block--border-{{ border_style }}"
+  style="
+    --cf-block-width: {{ width_value }};
+    --cf-block-width-mobile: {{ width_mobile_value }};
+    --cf-padding-top: {{ pt_rem }}rem;
+    --cf-padding-bottom: {{ pb_rem }}rem;
+    --cf-padding-left: {{ pl_rem }}rem;
+    --cf-padding-right: {{ pr_rem }}rem;
+    --cf-mobile-scale: {{ mobile_scale }};
+    --cf-field-radius: {{ border_radius_rem }}rem;
+    --cf-field-bg: {{ block.settings.field_background_color }};
+    --cf-field-text: {{ block.settings.field_text_color }};
+  "
+  {{ block.shopify_attributes }}
+>
+  {%- form 'contact', id: 'ContactFormBlock', class: 'contact-form-block__form' -%}
+
+    {%- if form.posted_successfully? -%}
+      <div class="cf-message cf-message--success" tabindex="-1" autofocus>
+        {% render 'icon-success' %}
+        {{ 'templates.contact.form.post_success' | t }}
+      </div>
+    {%- elsif form.errors -%}
+      <div class="cf-message cf-message--error" role="alert" tabindex="-1" autofocus>
+        {% render 'icon-error' %}
+        {{ 'templates.contact.form.error_heading' | t }}
+      </div>
+    {%- endif -%}
+
+    <div class="contact-form-block__fields">
+      {{ fields }}
+    </div>
+
+    <div class="contact-form-block__submit{% if block.settings.button_width == 'full' %} contact-form-block__submit--full{% endif %}">
+      <button type="submit" class="{{ button_class }}">
+        {{ block.settings.button_label }}
+      </button>
+    </div>
+
+  {%- endform -%}
+</div>
+
+{% schema %}
+{
+  "name": "Contact form",
+  "tag": null,
+  "blocks": [
+    { "type": "_contact-field" }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Submit button"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Style",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" },
+        { "value": "text", "label": "Text" }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Label",
+      "default": "Send"
+    },
+    {
+      "type": "select",
+      "id": "button_width",
+      "label": "Button width",
+      "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "auto"
+    },
+
+    {
+      "type": "header",
+      "content": "Field style"
+    },
+    {
+      "type": "select",
+      "id": "field_border_style",
+      "label": "Border style",
+      "options": [
+        { "value": "box", "label": "Box (all sides)" },
+        { "value": "underline", "label": "Underline" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "underline"
+    },
+    {
+      "type": "range",
+      "id": "field_border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.field_border_style == 'box' }}"
+    },
+    {
+      "type": "color",
+      "id": "field_background_color",
+      "label": "Field background color",
+      "default": "#F5F5F5",
+      "visible_if": "{{ block.settings.field_border_style == 'none' }}",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "field_text_color",
+      "label": "Field text color",
+      "default": "#000000",
+      "visible_if": "{{ block.settings.field_border_style == 'none' }}",
+      "alpha": true
+    },
+
+    {
+      "type": "header",
+      "content": "Dimensions"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width",
+      "options": [
+        { "value": "fill", "label": "t:options.fill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "width_custom",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:settings.width_mobile",
+      "options": [
+        { "value": "fill", "label": "t:options.fill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "width_mobile_custom",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_scale",
+      "label": "Mobile scale",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact form",
+      "category": "Forms",
+      "settings": {
+        "field_border_style": "box",
+        "field_border_radius": 8
+      },
+      "blocks": [
+        {
+          "type": "_contact-field",
+          "settings": {
+            "field_type": "text",
+            "label": "Name",
+            "placeholder": "Your name",
+            "show_label": false,
+            "required": false,
+            "full_width": false
+          }
+        },
+        {
+          "type": "_contact-field",
+          "settings": {
+            "field_type": "email",
+            "label": "Email",
+            "placeholder": "Your email",
+            "show_label": false,
+            "required": true,
+            "full_width": false
+          }
+        },
+        {
+          "type": "_contact-field",
+          "settings": {
+            "field_type": "phone",
+            "label": "Phone",
+            "placeholder": "Your phone",
+            "show_label": false,
+            "required": false,
+            "full_width": true
+          }
+        },
+        {
+          "type": "_contact-field",
+          "settings": {
+            "field_type": "textarea",
+            "label": "Message",
+            "placeholder": "Your message",
+            "show_label": false,
+            "required": false,
+            "full_width": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

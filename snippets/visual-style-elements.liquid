@@ -1,0 +1,59 @@
+{%- doc -%}
+  Renders background media and overlay HTML elements.
+  Called inside a container with position: relative.
+
+  @param {object} settings - The settings object (section.settings or block.settings)
+{%- enddoc -%}
+
+{%- if settings.background_media == 'image' and settings.background_image != blank -%}
+  {%- assign img_style = 'object-fit: ' | append: settings.background_image_position -%}
+  <div class="container-background-media">
+    {{ settings.background_image | image_url: width: 1920 | image_tag:
+      class: 'container-bg-media',
+      loading: 'lazy',
+      style: img_style
+    }}
+  </div>
+{%- endif -%}
+
+{%- if settings.background_media == 'video' and settings.video != blank -%}
+  {%- assign video_style = 'object-fit: ' | append: settings.video_position -%}
+  <div class="container-background-media">
+    {{ settings.video | video_tag:
+      autoplay: true,
+      loop: true,
+      muted: true,
+      class: 'container-bg-media',
+      style: video_style
+    }}
+  </div>
+{%- endif -%}
+
+{%- if settings.toggle_overlay -%}
+  {%- if settings.overlay_style == 'gradient' -%}
+    <div class="container-overlay" style="background: linear-gradient({{ settings.gradient_direction }}, {{ settings.overlay_color }}, transparent);"></div>
+  {%- else -%}
+    <div class="container-overlay" style="background: {{ settings.overlay_color }};"></div>
+  {%- endif -%}
+{%- endif -%}
+
+{% stylesheet %}
+  .container-background-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .container-bg-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .container-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+{% endstylesheet %}

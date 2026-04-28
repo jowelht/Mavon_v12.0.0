@@ -1,0 +1,48 @@
+{% comment %}
+  Renders a product card placeholder
+
+  Accepts:
+  - product_card_placeholder: {String} placeholder SVG name
+  - product_item: {String} wrapper class
+  - round_image: {Boolean} round image corners
+  - media_size: {String} image ratio (adapt, portrait, square, landscape) — default: square
+  - show_title: {Boolean} show title — default: true
+  - show_price: {Boolean} show price — default: true
+
+  Usage:
+  {% render 'product-card-placeholder' %}
+{% endcomment %}
+
+{%- liquid
+  if media_size == blank or media_size == 'adapt'
+    assign media_size = 'square'
+  endif
+
+  unless show_title == false
+    assign show_title = true
+  endunless
+
+  unless show_price == false
+    assign show_price = true
+  endunless
+-%}
+
+<div
+  class="{{ product_item }} {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  {% if settings.animations_reveal_on_scroll %}
+    data-cascade
+    style="--animation-order: {{ forloop.index }};"
+  {% endif %}
+>
+  <div
+    class="mb-15 placeholder media media--{{ media_size }} {% if round_image %}rounded--image{% endif %} card--client-height"
+  >
+    {{ product_card_placeholder | placeholder_svg_tag: 'placeholder-svg-2' }}
+  </div>
+  {%- if show_title -%}
+    <span class="placholder__product--title {{ settings.product_title_size }}"> {{ 'onboarding.product_title' | t }} </span>
+  {%- endif -%}
+  {%- if show_price -%}
+    <span class="product-grid-item__price">$99.99</span>
+  {%- endif -%}
+</div>

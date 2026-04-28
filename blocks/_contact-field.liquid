@@ -1,0 +1,237 @@
+{%- liquid
+  assign field_type = block.settings.field_type
+  assign label = block.settings.label
+  assign placeholder = block.settings.placeholder
+  assign is_required = block.settings.required
+  assign is_full = block.settings.full_width
+
+  # Unique ID per field instance
+  assign field_id = 'ContactField--' | append: block.id
+
+  # Email field must use name="contact[email]" for Shopify
+  # All other fields use name="contact[Label]"
+  if field_type == 'email'
+    assign field_name = 'contact[email]'
+  else
+    assign field_name = 'contact[' | append: label | append: ']'
+  endif
+
+  # Parse options — supports both newline-separated and comma-separated
+  # Use newline_to_br filter to detect newlines, then split on <br /> tags
+  assign raw_options = block.settings.options
+  assign field_options = raw_options | newline_to_br | split: '<br />'
+  if field_options.size <= 1 and raw_options contains ','
+    assign field_options = raw_options | split: ','
+  endif
+-%}
+
+<div
+  class="contact-form-block__field{% if is_full %} contact-form-block__field--full{% else %} contact-form-block__field--half{% endif %}"
+  {{ block.shopify_attributes }}
+>
+  <label
+    class="contact-form-block__label{% if is_required %} contact-form-block__label--required{% endif %}{% unless block.settings.show_label %} visually-hidden{% endunless %}"
+    for="{{ field_id }}"
+  >
+    {{ label }}
+  </label>
+
+  {%- case field_type -%}
+
+    {%- when 'text' -%}
+      <input
+        type="text"
+        id="{{ field_id }}"
+        class="cf-input"
+        name="{{ field_name }}"
+        placeholder="{{ placeholder }}"
+        autocomplete="name"
+        {% if is_required %}required aria-required="true"{% endif %}
+      >
+
+    {%- when 'email' -%}
+      <input
+        type="email"
+        id="{{ field_id }}"
+        class="cf-input"
+        name="{{ field_name }}"
+        placeholder="{{ placeholder }}"
+        autocomplete="email"
+        spellcheck="false"
+        autocapitalize="off"
+        {% if is_required %}required aria-required="true"{% endif %}
+      >
+
+    {%- when 'phone' -%}
+      <input
+        type="tel"
+        id="{{ field_id }}"
+        class="cf-input"
+        name="{{ field_name }}"
+        placeholder="{{ placeholder }}"
+        autocomplete="tel"
+        pattern="[0-9\-]*"
+        {% if is_required %}required aria-required="true"{% endif %}
+      >
+
+    {%- when 'textarea' -%}
+      <textarea
+        id="{{ field_id }}"
+        class="cf-textarea"
+        name="{{ field_name }}"
+        rows="6"
+        placeholder="{{ placeholder }}"
+        {% if is_required %}required aria-required="true"{% endif %}
+      ></textarea>
+
+    {%- when 'select' -%}
+      <div class="contact-form-block__select-wrapper">
+        <select
+          id="{{ field_id }}"
+          class="cf-select"
+          name="{{ field_name }}"
+          {% if is_required %}required aria-required="true"{% endif %}
+        >
+          {%- if placeholder != blank -%}
+            <option value="" disabled selected>{{ placeholder }}</option>
+          {%- endif -%}
+          {%- for option in field_options -%}
+            {%- assign opt = option | strip -%}
+            {%- if opt != blank -%}
+              <option value="{{ opt }}">{{ opt }}</option>
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+        <span class="contact-form-block__select-arrow">
+          {%- render 'icon-caret' -%}
+        </span>
+      </div>
+
+    {%- when 'radio' -%}
+      <div class="contact-form-block__option-group{% if block.settings.options_layout == 'vertical' %} contact-form-block__option-group--vertical{% endif %}">
+        {%- for option in field_options -%}
+          {%- assign opt = option | strip -%}
+          {%- if opt != blank -%}
+            <label class="contact-form-block__option-item">
+              <input
+                type="radio"
+                name="{{ field_name }}"
+                value="{{ opt }}"
+                {% if is_required and forloop.first %}required{% endif %}
+              >
+              {{ opt }}
+            </label>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+    {%- when 'checkbox' -%}
+      {%- assign checked_val = block.settings.checked_value | default: 'Yes' -%}
+      {%- assign unchecked_val = block.settings.unchecked_value | default: 'No' -%}
+      <div class="contact-form-block__option-group">
+        <input type="hidden" name="{{ field_name }}" value="{{ unchecked_val }}">
+        <label class="contact-form-block__option-item">
+          <input
+            type="checkbox"
+            name="{{ field_name }}"
+            value="{{ checked_val }}"
+            {% if is_required %}required{% endif %}
+          >
+          {{ label }}
+        </label>
+      </div>
+
+  {%- endcase -%}
+</div>
+
+{% schema %}
+{
+  "name": "Contact field",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "field_type",
+      "label": "Field type",
+      "options": [
+        { "value": "text", "label": "Text" },
+        { "value": "email", "label": "Email" },
+        { "value": "phone", "label": "Phone" },
+        { "value": "textarea", "label": "Textarea" },
+        { "value": "select", "label": "Select (dropdown)" },
+        { "value": "radio", "label": "Radio buttons" },
+        { "value": "checkbox", "label": "Checkbox" }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Field"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "visible_if": "{{ block.settings.field_type == 'text' or block.settings.field_type == 'email' or block.settings.field_type == 'phone' or block.settings.field_type == 'textarea' or block.settings.field_type == 'select' }}"
+    },
+    {
+      "type": "textarea",
+      "id": "options",
+      "label": "Options",
+      "info": "Enter each option on a new line, or use comma-separated values. e.g.\nOption A\nOption B\nOption C",
+      "visible_if": "{{ block.settings.field_type == 'select' or block.settings.field_type == 'radio' }}"
+    },
+    {
+      "type": "select",
+      "id": "options_layout",
+      "label": "Options layout",
+      "options": [
+        { "value": "horizontal", "label": "Horizontal" },
+        { "value": "vertical", "label": "Vertical" }
+      ],
+      "default": "horizontal",
+      "visible_if": "{{ block.settings.field_type == 'radio' }}"
+    },
+    {
+      "type": "text",
+      "id": "checked_value",
+      "label": "Checked value",
+      "default": "Yes",
+      "visible_if": "{{ block.settings.field_type == 'checkbox' }}"
+    },
+    {
+      "type": "text",
+      "id": "unchecked_value",
+      "label": "Unchecked value",
+      "default": "No",
+      "visible_if": "{{ block.settings.field_type == 'checkbox' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Show label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "required",
+      "label": "Required",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true,
+      "info": "Uncheck for half width (sits side by side with another half-width field)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact field"
+    }
+  ]
+}
+{% endschema %}

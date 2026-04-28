@@ -1,0 +1,18 @@
+.text-word {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+.text_layer__content>* {
+    margin-bottom: 0rem;
+}
+.text_layer__content {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: var(--layered-alignment, flex-start);
+}
+.text-char {
+    transition: .3s;
+    font-weight: 500;
+}

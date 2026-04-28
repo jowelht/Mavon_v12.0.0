@@ -1,0 +1,223 @@
+{%- comment -%}
+  Typography Variables Snippet
+  Generates CSS custom properties for the advanced typography system
+  Maintains backward compatibility with existing theme settings
+{%- endcomment -%}
+
+{%- liquid
+  # Line height mapping for body text
+  case settings.body_line_height
+    when 'compact'
+      assign body_line_height_value = 1.4
+    when 'normal'
+      assign body_line_height_value = 1.6
+    when 'relaxed'
+      assign body_line_height_value = 1.8
+    when 'loose'
+      assign body_line_height_value = 2.0
+    else
+      assign body_line_height_value = 1.6
+  endcase
+
+  # Line height mapping for headings
+  case settings.heading_line_height
+    when 'none'
+      assign heading_line_height_value = 1.0
+    when 'tight'
+      assign heading_line_height_value = 1.2
+    when 'snug'
+      assign heading_line_height_value = 1.4
+    when 'normal'
+      assign heading_line_height_value = 1.5
+    else
+      assign heading_line_height_value = 1.2
+  endcase
+-%}
+
+{%- style -%}
+  :root {
+    /* Font Library - 4 Base Fonts */
+    --font-primary-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    --font-primary-style: {{ settings.type_body_font.style }};
+    --font-primary-weight: {{ settings.type_body_font.weight }};
+
+    --font-heading-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+    --font-heading-style: {{ settings.type_header_font.style }};
+    --font-heading-weight: {{ settings.type_header_font.weight }};
+
+    --font-accent-family: {{ settings.type_accent_font.family }}, {{ settings.type_accent_font.fallback_families }};
+    --font-accent-style: {{ settings.type_accent_font.style }};
+    --font-accent-weight: {{ settings.type_accent_font.weight }};
+
+    --font-display-family: {{ settings.type_display_font.family }}, {{ settings.type_display_font.fallback_families }};
+    --font-display-style: {{ settings.type_display_font.style }};
+    --font-display-weight: {{ settings.type_display_font.weight }};
+
+    /* Backward Compatibility - Body Font Variables */
+    {%- case settings.body_font_source -%}
+      {%- when 'primary' -%}
+        --font-body-family: var(--font-primary-family);
+        --font-body-style: var(--font-primary-style);
+        --font-body-weight: var(--font-primary-weight);
+      {%- when 'heading' -%}
+        --font-body-family: var(--font-heading-family);
+        --font-body-style: var(--font-heading-style);
+        --font-body-weight: var(--font-heading-weight);
+      {%- when 'accent' -%}
+        --font-body-family: var(--font-accent-family);
+        --font-body-style: var(--font-accent-style);
+        --font-body-weight: var(--font-accent-weight);
+      {%- when 'display' -%}
+        --font-body-family: var(--font-display-family);
+        --font-body-style: var(--font-display-style);
+        --font-body-weight: var(--font-display-weight);
+      {%- else -%}
+        --font-body-family: var(--font-primary-family);
+        --font-body-style: var(--font-primary-style);
+        --font-body-weight: var(--font-primary-weight);
+    {%- endcase -%}
+
+    /* Body Typography Controls */
+    --body-line-height: {{ body_line_height_value }};
+    --body-letter-spacing: {{ settings.body_letter_spacing }}px;
+
+    /* Global Heading Font Variables */
+    {%- case settings.heading_font_source -%}
+      {%- when 'primary' -%}
+        --heading-global-family: var(--font-primary-family);
+        --heading-global-style: var(--font-primary-style);
+        --heading-global-weight: var(--font-primary-weight);
+      {%- when 'heading' -%}
+        --heading-global-family: var(--font-heading-family);
+        --heading-global-style: var(--font-heading-style);
+        --heading-global-weight: var(--font-heading-weight);
+      {%- when 'accent' -%}
+        --heading-global-family: var(--font-accent-family);
+        --heading-global-style: var(--font-accent-style);
+        --heading-global-weight: var(--font-accent-weight);
+      {%- when 'display' -%}
+        --heading-global-family: var(--font-display-family);
+        --heading-global-style: var(--font-display-style);
+        --heading-global-weight: var(--font-display-weight);
+      {%- else -%}
+        --heading-global-family: var(--font-heading-family);
+        --heading-global-style: var(--font-heading-style);
+        --heading-global-weight: var(--font-heading-weight);
+    {%- endcase -%}
+
+    /* Global Heading Typography Controls */
+    --heading-global-line-height: {{ heading_line_height_value }};
+    --heading-global-letter-spacing: {{ settings.heading_letter_spacing }}px;
+    --heading-global-text-transform: {{ settings.header_text_case }};
+
+    /* Per-Heading Variables with Fallbacks */
+    {%- for i in (1..6) -%}
+      {%- assign h_custom_enabled = 'h' | append: i | append: '_custom_enabled' -%}
+      {%- assign h_font_source = 'h' | append: i | append: '_font_source' -%}
+      {%- assign h_font_size = 'h' | append: i | append: '_font_size' -%}
+      {%- assign h_line_height = 'h' | append: i | append: '_line_height' -%}
+      {%- assign h_letter_spacing = 'h' | append: i | append: '_letter_spacing' -%}
+      {%- assign h_text_case = 'h' | append: i | append: '_text_case' -%}
+
+      {%- if settings[h_custom_enabled] -%}
+        /* H{{ i }} Custom Typography */
+        {%- case settings[h_font_source] -%}
+          {%- when 'primary' -%}
+            --h{{ i }}-font-family: var(--font-primary-family);
+            --h{{ i }}-font-style: var(--font-primary-style);
+            --h{{ i }}-font-weight: var(--font-primary-weight);
+          {%- when 'heading' -%}
+            --h{{ i }}-font-family: var(--font-heading-family);
+            --h{{ i }}-font-style: var(--font-heading-style);
+            --h{{ i }}-font-weight: var(--font-heading-weight);
+          {%- when 'accent' -%}
+            --h{{ i }}-font-family: var(--font-accent-family);
+            --h{{ i }}-font-style: var(--font-accent-style);
+            --h{{ i }}-font-weight: var(--font-accent-weight);
+          {%- when 'display' -%}
+            --h{{ i }}-font-family: var(--font-display-family);
+            --h{{ i }}-font-style: var(--font-display-style);
+            --h{{ i }}-font-weight: var(--font-display-weight);
+          {%- else -%}
+            --h{{ i }}-font-family: var(--heading-global-family);
+            --h{{ i }}-font-style: var(--heading-global-style);
+            --h{{ i }}-font-weight: var(--heading-global-weight);
+        {%- endcase -%}
+
+        {%- comment -%} Font Size - Responsive values {%- endcomment -%}
+        {%- unless settings[h_font_size] == 'inherit' -%}
+          {%- case settings[h_font_size] -%}
+            {%- when '12' -%}
+              --h{{ i }}-font-size-mobile: 1.2rem;
+              --h{{ i }}-font-size-tablet: 1.4rem;
+              --h{{ i }}-font-size-desktop: 1.6rem;
+            {%- when '14' -%}
+              --h{{ i }}-font-size-mobile: 1.4rem;
+              --h{{ i }}-font-size-tablet: 1.6rem;
+              --h{{ i }}-font-size-desktop: 1.8rem;
+            {%- when '16' -%}
+              --h{{ i }}-font-size-mobile: 1.6rem;
+              --h{{ i }}-font-size-tablet: 1.8rem;
+              --h{{ i }}-font-size-desktop: 2rem;
+            {%- when '18' -%}
+              --h{{ i }}-font-size-mobile: 1.8rem;
+              --h{{ i }}-font-size-tablet: 2rem;
+              --h{{ i }}-font-size-desktop: 2.2rem;
+            {%- when '20' -%}
+              --h{{ i }}-font-size-mobile: 2rem;
+              --h{{ i }}-font-size-tablet: 2.2rem;
+              --h{{ i }}-font-size-desktop: 2.4rem;
+            {%- when '24' -%}
+              --h{{ i }}-font-size-mobile: 2.4rem;
+              --h{{ i }}-font-size-tablet: 2.8rem;
+              --h{{ i }}-font-size-desktop: 3.2rem;
+            {%- when '28' -%}
+              --h{{ i }}-font-size-mobile: 2.8rem;
+              --h{{ i }}-font-size-tablet: 3.2rem;
+              --h{{ i }}-font-size-desktop: 4rem;
+            {%- when '32' -%}
+              --h{{ i }}-font-size-mobile: 3.2rem;
+              --h{{ i }}-font-size-tablet: 4rem;
+              --h{{ i }}-font-size-desktop: 4.8rem;
+            {%- when '36' -%}
+              --h{{ i }}-font-size-mobile: 3.6rem;
+              --h{{ i }}-font-size-tablet: 4.4rem;
+              --h{{ i }}-font-size-desktop: 5.6rem;
+            {%- when '40' -%}
+              --h{{ i }}-font-size-mobile: 4rem;
+              --h{{ i }}-font-size-tablet: 4.8rem;
+              --h{{ i }}-font-size-desktop: 6.4rem;
+            {%- when '48' -%}
+              --h{{ i }}-font-size-mobile: 4.8rem;
+              --h{{ i }}-font-size-tablet: 5.6rem;
+              --h{{ i }}-font-size-desktop: 7.2rem;
+          {%- endcase -%}
+        {%- endunless -%}
+
+        {%- comment -%} Line Height {%- endcomment -%}
+        {%- unless settings[h_line_height] == 'inherit' -%}
+          {%- case settings[h_line_height] -%}
+            {%- when 'none' -%}
+              --h{{ i }}-line-height: 1;
+            {%- when 'tight' -%}
+              --h{{ i }}-line-height: 1.2;
+            {%- when 'snug' -%}
+              --h{{ i }}-line-height: 1.4;
+            {%- when 'normal' -%}
+              --h{{ i }}-line-height: 1.5;
+          {%- endcase -%}
+        {%- endunless -%}
+
+        {%- comment -%} Letter Spacing {%- endcomment -%}
+        {%- unless settings[h_letter_spacing] == 'inherit' -%}
+          --h{{ i }}-letter-spacing: {{ settings[h_letter_spacing] }}px;
+        {%- endunless -%}
+
+        {%- comment -%} Text Transform {%- endcomment -%}
+        {%- unless settings[h_text_case] == 'inherit' -%}
+          --h{{ i }}-text-transform: {{ settings[h_text_case] }};
+        {%- endunless -%}
+      {%- endif -%}
+    {%- endfor -%}
+  }
+{%- endstyle -%}

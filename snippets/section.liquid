@@ -1,0 +1,142 @@
+{%- doc -%}
+  Renders a wrapper section.
+
+  @param {section} section - The section object
+  @param {string} children - The children of the section
+{%- enddoc -%}
+
+{%- assign contained = section.settings.contain_styling -%}
+
+<div class="section-scheme{% unless contained %} border-style color-{{ section.settings.color_scheme }}{% endunless %}"
+  {% unless contained %}
+    style="{% render 'visual-style-vars', settings: section.settings %}"
+  {% endunless %}
+>
+  <div class="section-background">
+    {% unless contained %}
+      {% render 'visual-style-elements', settings: section.settings %}
+    {% endunless %}
+  </div>
+  <div
+    class="section-container{% if section.settings.section_width == 'page-width' %} section--page-width{% else %} section--full-width{% endif %}"
+    {% if request.visual_preview_mode %}data-shopify-visual-preview{% endif %}
+    style="
+      {% if section.settings.section_height == 'custom' %}
+        --section-min-height: {{ section.settings.section_height_custom }}svh;
+      {% elsif section.settings.section_height == 'full-screen' %}
+        --section-min-height: 100svh;
+      {% elsif section.settings.section_height != '' %}
+        --section-min-height: var(--section-height-{{ section.settings.section_height }});
+      {% endif %}
+      {% if section.settings.section_height != '' %}
+        --section-preview-height: 600px;
+      {% endif %}
+      {% render 'flex-layout', settings: section.settings %}
+    "
+  >
+    {% if contained %}
+      <div class="section--contained border-style color-{{ section.settings.color_scheme }}"
+        style="{% render 'visual-style-vars', settings: section.settings %}"
+      >
+        {% render 'visual-style-elements', settings: section.settings %}
+        <div class="custom-section-content flex-container">
+          {{ children }}
+        </div>
+      </div>
+    {% else %}
+      <div class="custom-section-content flex-container">
+        {{ children }}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .section-wrapper {
+    --section-height-offset: 0px;
+  }
+
+  .section-scheme {
+    position: relative;
+  }
+
+  .section-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .section-container {
+    position: relative;
+    z-index: 1;
+    --section-height-small: 30svh;
+    --section-height-medium: 50svh;
+    --section-height-large: 70svh;
+    min-height: var(--section-min-height);
+    padding-block-start: var(--padding-block-start, 0);
+    padding-block-end: var(--padding-block-end, 0);
+    padding-inline-start: var(--padding-inline-start, 15px);
+    padding-inline-end: var(--padding-inline-end, 15px);
+  }
+
+  .section--page-width {
+    max-width: var(--page-width);
+    margin-inline: auto;
+  }
+
+  .section--full-width {
+    max-width: 100%;
+  }
+
+  .section[data-shopify-visual-preview] {
+    min-height: var(--section-preview-height);
+    padding-top: 0;
+  }
+
+  .section[data-shopify-visual-preview] .custom-section-background {
+    display: none;
+  }
+
+  body:has(> #header-group > .header-section > #header-component[transparent]):not(
+      :has(> #header-group > .header-section + .shopify-section)
+    )
+    > main
+    > .section-wrapper:first-child {
+    --section-height-offset: var(--header-group-height, 0);
+  }
+
+  .custom-section-background {
+    grid-column: 1 / -1;
+  }
+
+  .section--contained {
+    position: relative;
+    min-height: inherit;
+    padding-block-start: var(--padding-block-start, 0);
+    padding-block-end: var(--padding-block-end, 0);
+    padding-inline-start: var(--padding-inline-start, 15px);
+    padding-inline-end: var(--padding-inline-end, 15px);
+  }
+
+  .custom-section-content {
+    position: relative;
+    z-index: 2;
+    min-height: inherit;
+  }
+
+  @media screen and (max-width: 749px) {
+    .section-container {
+      padding-block-start: calc(var(--padding-block-start, 0) * var(--padding-mobile-scale, 1));
+      padding-block-end: calc(var(--padding-block-end, 0) * var(--padding-mobile-scale, 1));
+      padding-inline-start: calc(var(--padding-inline-start, 15px) * var(--padding-mobile-scale, 1));
+      padding-inline-end: calc(var(--padding-inline-end, 15px) * var(--padding-mobile-scale, 1));
+    }
+
+    .section--contained {
+      padding-block-start: calc(var(--padding-block-start, 0) * var(--padding-mobile-scale, 1));
+      padding-block-end: calc(var(--padding-block-end, 0) * var(--padding-mobile-scale, 1));
+      padding-inline-start: calc(var(--padding-inline-start, 15px) * var(--padding-mobile-scale, 1));
+      padding-inline-end: calc(var(--padding-inline-end, 15px) * var(--padding-mobile-scale, 1));
+    }
+  }
+{% endstylesheet %}

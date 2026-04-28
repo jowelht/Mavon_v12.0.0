@@ -1,0 +1,48 @@
+{% comment %}
+  Renders an article card placeholder
+
+  Accepts:
+  - media_height: {String} image ratio (adapt, small, medium, large) — default: medium
+  - round_image: {Boolean} round image corners
+  - show_date: {Boolean} show date — default: false
+  - show_author: {Boolean} show author — default: false
+
+  Usage:
+  {% render 'article-card-placeholder' %}
+{% endcomment %}
+
+{%- liquid
+  assign is_new_ratio = false
+  if media_height == 'square' or media_height == 'portrait' or media_height == 'landscape'
+    assign is_new_ratio = true
+  endif
+
+  if media_height == blank or media_height == 'adapt'
+    assign media_height = 'medium'
+  endif
+-%}
+
+<article class="article-card">
+  <a href="#" class="article-content">
+    <div class="card__meida--inner {% if is_new_ratio == false %} article-media--position article-card__image--{{ media_height }}{% endif %}">
+      <div class="article-card__image media {% if is_new_ratio %}media--{{ media_height }}{% endif %} {% if round_image %}rounded--image{% endif %}">
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg-2' }}
+      </div>
+    </div>
+    <div class="article-card__info">
+      <h2 class="article-card__title h5 mb-0">Article title</h2>
+      {%- if show_date or show_author -%}
+        <div class="article__meta">
+          {%- if show_date -%}
+            <span class="meta__info--item circle-divider">
+              {{ 'now' | date: '%b %d, %Y' }}
+            </span>
+          {%- endif -%}
+          {%- if show_author -%}
+            <span class="meta__info--item">Author</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </a>
+</article>

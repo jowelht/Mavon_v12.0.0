@@ -1,0 +1,92 @@
+{%- doc -%}
+  Outputs CSS custom properties for custom typography.
+  Called inside a style="" attribute by the parent block.
+
+  @param {object} settings - The block settings object
+{%- enddoc -%}
+
+{%- liquid
+  # ── Font family + weight ──
+  case settings.font
+    when 'heading'
+      assign font_family = 'var(--heading-global-family, var(--font-heading-family))'
+      assign font_weight = 'var(--heading-global-weight, var(--font-heading-weight))'
+    when 'accent'
+      assign font_family = 'var(--font-accent-family)'
+      assign font_weight = 'var(--font-accent-weight)'
+    when 'display'
+      assign font_family = 'var(--font-display-family)'
+      assign font_weight = 'var(--font-display-weight)'
+    else
+      assign font_family = 'var(--font-body-family)'
+      assign font_weight = 'var(--font-body-weight)'
+  endcase
+
+  # ── Line height ──
+  case settings.line_height
+    when 'tight'
+      assign line_height = '1.2'
+    when 'loose'
+      assign line_height = '1.8'
+    else
+      assign line_height = '1.5'
+  endcase
+
+  # ── Letter spacing ──
+  case settings.letter_spacing
+    when 'tight'
+      assign letter_spacing = '-0.02em'
+    when 'loose'
+      assign letter_spacing = '0.06em'
+    else
+      assign letter_spacing = 'normal'
+  endcase
+
+  # ── Font size with dynamic clamp ──
+  assign fluid_cutoff = 2.4
+  assign base_min = 2.4
+  assign growth_rate = 0.45
+  assign reference_vp = 1200.0
+
+  if settings.font_size != blank
+    assign font_size_rem = settings.font_size | remove: 'rem' | times: 1.0
+
+    if font_size_rem >= fluid_cutoff
+      assign font_size_px = font_size_rem | times: 10.0
+      assign vw_value = font_size_px | divided_by: reference_vp | times: 100.0
+
+      assign scale_factor = font_size_rem | divided_by: fluid_cutoff
+      assign dynamic_min = scale_factor | minus: 1 | times: growth_rate | plus: base_min
+    endif
+  endif
+-%}
+
+{%- capture variables -%}
+  --font-family: {{ font_family }};
+  --font-weight: {{ font_weight }};
+  --line-height: {{ line_height }};
+  --letter-spacing: {{ letter_spacing }};
+  --text-transform: {{ settings.text_case }};
+  --text-wrap: {{ settings.wrap | default: 'pretty' }};
+  {%- if settings.font_size != blank -%}
+    {%- if font_size_rem >= fluid_cutoff -%}
+      --font-size: clamp({{ dynamic_min }}rem, {{ vw_value }}vw, {{ settings.font_size }});
+    {%- else -%}
+      --font-size: {{ settings.font_size }};
+    {%- endif -%}
+  {%- endif -%}
+{%- endcapture -%}
+{{- variables | strip | strip_newlines -}}
+
+{% stylesheet %}
+  .custom-typography,
+  .custom-typography > * {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    letter-spacing: var(--letter-spacing);
+    text-transform: var(--text-transform);
+    text-wrap: var(--text-wrap);
+  }
+{% endstylesheet %}

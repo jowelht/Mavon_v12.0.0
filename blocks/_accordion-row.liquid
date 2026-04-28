@@ -1,0 +1,234 @@
+{% stylesheet %}
+  .accordion-row {
+    display: block;
+  }
+
+  .accordion-row__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--row-padding-top, 16px);
+    padding-bottom: var(--row-padding-bottom, 16px);
+    padding-left: var(--row-padding-left, 0);
+    padding-right: var(--row-padding-right, 0);
+    cursor: pointer;
+    list-style: none;
+    gap: 12px;
+  }
+
+  .accordion-row__header::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion-row__heading {
+    margin: 0;
+    flex: 1;
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+  }
+
+  .accordion-row__content {
+    padding-bottom: var(--row-padding-bottom, 16px);
+    padding-left: var(--row-padding-left, 0);
+    padding-right: var(--row-padding-right, 0);
+  }
+
+  .accordion-row__row-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--row-icon-width, 24px);
+    height: var(--row-icon-height, 24px);
+  }
+
+  .accordion-row__row-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .accordion-row__row-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+{% endstylesheet %}
+
+{%- liquid
+  assign heading = block.settings.heading
+  assign open = block.settings.open_by_default
+
+  assign icon = block.settings.icon
+  assign image_icon = block.settings.image_icon
+  assign icon_size = block.settings.icon_size
+
+  case icon_size
+    when 'small'
+      assign icon_w = '16px'
+      assign icon_h = '16px'
+    when 'large'
+      assign icon_w = '32px'
+      assign icon_h = '32px'
+    when 'custom'
+      assign icon_w = block.settings.icon_custom_width | append: 'px'
+      assign icon_h = block.settings.icon_custom_height | append: 'px'
+    else
+      assign icon_w = '24px'
+      assign icon_h = '24px'
+  endcase
+
+  assign icon_size_style = '--row-icon-width: ' | append: icon_w | append: '; --row-icon-height: ' | append: icon_h | append: ';'
+-%}
+
+{%- capture children -%}
+  {% content_for 'blocks' %}
+{%- endcapture -%}
+
+<accordion-custom
+  class="accordion-row"
+  {{ block.shopify_attributes }}
+>
+  <details {% if open %}open{% endif %}>
+    <summary class="accordion-row__header">
+      {%- if image_icon != blank -%}
+        <span class="accordion-row__row-icon" style="{{ icon_size_style }}">
+          {{- image_icon | image_url: width: 80 | image_tag:
+            loading: 'lazy',
+            widths: '16, 24, 32, 48, 64, 80'
+          -}}
+        </span>
+      {%- elsif icon != 'none' -%}
+        <span class="accordion-row__row-icon" style="{{ icon_size_style }}">
+          {%- render 'icon-features', icon: icon -%}
+        </span>
+      {%- endif -%}
+      <span class="accordion-row__heading">{{ heading }}</span>
+      <span class="accordion-row__icon accordion-row__icon--plus">
+        {%- render 'icon-plus' -%}
+      </span>
+      <span class="accordion-row__icon accordion-row__icon--chevron">
+        {%- render 'icon-chevron' -%}
+      </span>
+      <span class="accordion-row__icon accordion-row__icon--caret">
+        {%- render 'icon-caret' -%}
+      </span>
+    </summary>
+    <div class="accordion-row__content">
+      {{ children }}
+    </div>
+  </details>
+</accordion-custom>
+
+{% schema %}
+{
+  "name": "Accordion row",
+  "tag": null,
+  "blocks": [
+    { "type": "@theme" }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Accordion row"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Open by default",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Icon"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "Icon",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "truck", "label": "Truck" },
+        { "value": "award", "label": "Award" },
+        { "value": "alarm", "label": "Alarm" },
+        { "value": "camera", "label": "Camera" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Clock" },
+        { "value": "compass", "label": "Compass" },
+        { "value": "card", "label": "Credit card" },
+        { "value": "dollar", "label": "Dollar" },
+        { "value": "gift", "label": "Gift" },
+        { "value": "lock", "label": "Lock" },
+        { "value": "map", "label": "Map" },
+        { "value": "mic", "label": "Mic" },
+        { "value": "monitor", "label": "Monitor" },
+        { "value": "phone", "label": "Phone" },
+        { "value": "cart", "label": "Cart" },
+        { "value": "bag", "label": "Shopping bag" },
+        { "value": "smile", "label": "Smile" },
+        { "value": "sun", "label": "Sun" },
+        { "value": "thumbs_up", "label": "Thumbs up" },
+        { "value": "thumbs_down", "label": "Thumbs down" },
+        { "value": "user", "label": "User" },
+        { "value": "users", "label": "Users" },
+        { "value": "watch", "label": "Watch" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_icon",
+      "label": "Image icon",
+      "info": "Upload a custom image to replace the icon list selection."
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "Icon size",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "range",
+      "id": "icon_custom_width",
+      "label": "Icon width",
+      "min": 8,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "visible_if": "{{ block.settings.icon_size == 'custom' }}"
+    },
+    {
+      "type": "range",
+      "id": "icon_custom_height",
+      "label": "Icon height",
+      "min": 8,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "visible_if": "{{ block.settings.icon_size == 'custom' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Accordion row",
+      "blocks": [
+        {
+          "type": "text",
+          "settings": {
+            "text": "<p>Share information about your brand with your customers.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

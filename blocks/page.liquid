@@ -1,0 +1,179 @@
+{% stylesheet %}
+  .page-block {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    align-items: flex-start;
+    padding-top: var(--page-padding-top, 0);
+    padding-bottom: var(--page-padding-bottom, 0);
+    padding-left: var(--page-padding-left, 0);
+    padding-right: var(--page-padding-right, 0);
+  }
+
+  .page-block__title {
+    margin-bottom: 1.6rem;
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+  }
+
+  .page-block .rte {
+    max-width: 100%;
+  }
+
+  @media screen and (max-width: 749px) {
+    .page-block {
+      padding-top: calc(var(--page-padding-top, 0) * var(--page-mobile-scale, 1));
+      padding-bottom: calc(var(--page-padding-bottom, 0) * var(--page-mobile-scale, 1));
+      padding-left: calc(var(--page-padding-left, 0) * var(--page-mobile-scale, 1));
+      padding-right: calc(var(--page-padding-right, 0) * var(--page-mobile-scale, 1));
+    }
+  }
+{% endstylesheet %}
+
+{%- liquid
+  assign page = block.settings.page
+  assign inherit_color_scheme = block.settings.inherit_color_scheme
+  assign color_scheme = block.settings.color_scheme
+  assign background = block.settings.background
+  assign background_color = block.settings.background_color
+
+  assign padding_top_rem = block.settings.padding_top | times: 0.1
+  assign padding_bottom_rem = block.settings.padding_bottom | times: 0.1
+  assign padding_left_rem = block.settings.padding_left | times: 0.1
+  assign padding_right_rem = block.settings.padding_right | times: 0.1
+  assign mobile_scale_decimal = block.settings.mobile_scale | divided_by: 100.0
+-%}
+
+<div
+  class="page-block{% unless inherit_color_scheme %} color-{{ color_scheme }}{% endunless %}"
+  style="
+    --page-padding-top: {{ padding_top_rem }}rem;
+    --page-padding-bottom: {{ padding_bottom_rem }}rem;
+    --page-padding-left: {{ padding_left_rem }}rem;
+    --page-padding-right: {{ padding_right_rem }}rem;
+    --page-mobile-scale: {{ mobile_scale_decimal }};
+    {% if background and background_color != blank %}background-color: {{ background_color }};{% endif %}
+  "
+  {{ block.shopify_attributes }}
+>
+  {%- if page != blank -%}
+    {%- if page.title != blank -%}
+      <h2 class="page-block__title">{{ page.title }}</h2>
+    {%- endif -%}
+    {%- if page.content != blank -%}
+      <div class="rte">{{ page.content }}</div>
+    {%- endif -%}
+  {%- else -%}
+    <h2 class="page-block__title">Page title</h2>
+    <div class="rte">
+      <p>Select a page to display its content.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Page",
+  "tag": null,
+  "settings": [
+    {
+      "type": "page",
+      "id": "page",
+      "label": "Page"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "Inherit color scheme",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "background",
+      "label": "Background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.background }}"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_scale",
+      "label": "Mobile scale",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Page",
+      "category": "Basic"
+    }
+  ]
+}
+{% endschema %}

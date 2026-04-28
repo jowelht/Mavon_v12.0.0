@@ -1,0 +1,166 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "1eb0bda7-098f-44ea-84e3-b98cbac02e3f": {
+          "type": "about_us",
+          "settings": {
+            "heading": "About",
+            "about_information": "<p>Use this text area to inform your customers about your brand and vision. You can modify it in the theme editor.</p>",
+            "social_media": true
+          }
+        },
+        "250b5362-a169-4e13-86c2-d36cb9444363": {
+          "type": "column_space",
+          "settings": {}
+        },
+        "f011bece-9191-4dd0-958c-e6ec737ddd0d": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Quick Links",
+            "menu": "footer"
+          }
+        },
+        "d133484b-b97e-4b50-b14b-9a9e6a1b422c": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Quick Links",
+            "menu": "footer"
+          }
+        },
+        "2afea511-cc39-4c26-b91f-84ad16da4248": {
+          "type": "contact_info",
+          "settings": {
+            "heading": "Contact Info",
+            "contact_address": "<p>Share information such as the store's physical address, contact details, opening hours, etc.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "1eb0bda7-098f-44ea-84e3-b98cbac02e3f",
+        "250b5362-a169-4e13-86c2-d36cb9444363",
+        "f011bece-9191-4dd0-958c-e6ec737ddd0d",
+        "d133484b-b97e-4b50-b14b-9a9e6a1b422c",
+        "2afea511-cc39-4c26-b91f-84ad16da4248"
+      ],
+      "settings": {
+        "color_scheme": "background-1",
+        "enable_follow_on_shop": true,
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "payment_enable": true,
+        "content_alignment": "left",
+        "show_divider": true,
+        "show_divider_home": false,
+        "margin_top": 0,
+        "mobile_margin_top": 0,
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "mobile_padding_top": 65,
+        "mobile_padding_bottom": 50
+      }
+    },
+    "email-popup": {
+      "type": "email-popup",
+      "blocks": {
+        "0fb5cf40-4cd3-41e2-bd71-ba1aa4b7c931": {
+          "type": "heading",
+          "settings": {
+            "heading": "Heading",
+            "heading_size": "h3"
+          }
+        },
+        "dc66302c-c380-4bee-8c46-0a1d95ad1a21": {
+          "type": "text",
+          "settings": {
+            "richtext": "<p>Sign up for our newsletter to be the first to learn about new arrivals, special promotions, and online exclusives.</p>"
+          }
+        },
+        "d135b4c9-eaee-418e-9d8a-30d738cf2457": {
+          "type": "email_form",
+          "settings": {
+            "richtext": "<p>*By submitting this form, you agree to receive our emails and may unsubscribe at any time.</p>",
+            "button_full": false
+          }
+        }
+      },
+      "block_order": [
+        "0fb5cf40-4cd3-41e2-bd71-ba1aa4b7c931",
+        "dc66302c-c380-4bee-8c46-0a1d95ad1a21",
+        "d135b4c9-eaee-418e-9d8a-30d738cf2457"
+      ],
+      "settings": {
+        "display": "enable",
+        "show_home_page": true,
+        "show_visitors": true,
+        "delay": 5,
+        "dont_show": true,
+        "dont_show_label": "No thanks!",
+        "expire": 7,
+        "popup_position": "center",
+        "popup_width": "medium",
+        "alignment": "left",
+        "image_position": "left",
+        "full--bg-image": false,
+        "image_overlay_opacity": 0,
+        "color_scheme": "",
+        "custom_colors": true,
+        "background_color": "#ffffff",
+        "foreground_color": "#121212",
+        "button_background": "#121212",
+        "button_foreground": "#ffffff",
+        "hover_button_background": "#121212",
+        "hover_button_foreground": "#ffffff"
+      }
+    },
+    "age-verifier-popup": {
+      "type": "age-verifier-popup",
+      "blocks": {
+        "heading_3qHnLy": {
+          "type": "heading",
+          "settings": {
+            "heading": "Confirm your age",
+            "heading_size": "h3"
+          }
+        },
+        "text_QnQyiw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Are you 18 years old or older?</p>"
+          }
+        },
+        "buttons_ppMLm4": {
+          "type": "buttons",
+          "settings": {
+            "accept_button_label": "Yes, I am",
+            "refuse_button_label": "No, I'm not"
+          }
+        }
+      },
+      "block_order": ["heading_3qHnLy", "text_QnQyiw", "buttons_ppMLm4"],
+      "disabled": true,
+      "settings": {
+        "display": "enable",
+        "expire": 7,
+        "heading": "Sorry!",
+        "text": "<p>This content is for adults only. Please return when you’re older.</p>",
+        "go_button_label": "Go Back",
+        "overlay_color": "#191b21",
+        "color_scheme": ""
+      }
+    }
+  },
+  "order": ["footer", "email-popup", "age-verifier-popup"]
+}

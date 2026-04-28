@@ -1,0 +1,629 @@
+{% stylesheet %}
+  accordion-group {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    width: var(--accordion-width, 100%);
+  }
+
+  .accordion-block {
+    width: 100%;
+    padding-top: var(--accordion-padding-top, 0);
+    padding-bottom: var(--accordion-padding-bottom, 0);
+    padding-left: var(--accordion-padding-left, 0);
+    padding-right: var(--accordion-padding-right, 0);
+  }
+
+  /* Icon visibility — parent controls which icon children show */
+  .accordion--icon-plus .accordion-row__icon--chevron,
+  .accordion--icon-plus .accordion-row__icon--caret,
+  .accordion--icon-chevron .accordion-row__icon--plus,
+  .accordion--icon-chevron .accordion-row__icon--caret,
+  .accordion--icon-caret .accordion-row__icon--plus,
+  .accordion--icon-caret .accordion-row__icon--chevron {
+    display: none;
+  }
+
+  /* Icon rotation on open */
+  .accordion-row__icon {
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .accordion-row__icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .accordion-row__icon--caret svg {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  /* Reset base CSS conflict: summary .icon-caret */
+  .accordion-row__header .icon-caret {
+    position: static;
+  }
+
+  details[open] > .accordion-row__header .accordion-row__icon--plus {
+    transform: rotate(45deg);
+  }
+
+  details[open] > .accordion-row__header .accordion-row__icon--chevron {
+    transform: rotate(180deg);
+  }
+
+  details[open] > .accordion-row__header .accordion-row__icon--caret {
+    transform: rotate(180deg);
+  }
+
+  /* Solid icon style */
+  .accordion--icon-style-solid .accordion-row__icon {
+    background: rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+  }
+
+  .accordion--icon-style-solid .accordion-row__icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .accordion--icon-style-solid .accordion-row__icon--caret svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  /* Heading preset — parent class controls child heading appearance */
+  .accordion--heading-h3 .accordion-row__heading { font-size: calc(var(--font-heading-size) * 2rem); }
+  .accordion--heading-h4 .accordion-row__heading { font-size: calc(var(--font-heading-size) * 1.6rem); }
+  .accordion--heading-h5 .accordion-row__heading { font-size: calc(var(--font-heading-size) * 1.3rem); }
+  .accordion--heading-h6 .accordion-row__heading { font-size: calc(var(--font-heading-size) * 1.1rem); }
+  .accordion--heading-p .accordion-row__heading {
+    font-family: var(--font-body-family);
+    font-weight: var(--font-body-weight);
+    font-size: 1.4rem;
+  }
+
+  /* Border — parent class controls child row borders */
+  .accordion--border-solid .accordion-row {
+    border-bottom: var(--accordion-border-width, 1px) solid rgba(var(--color-foreground), var(--accordion-border-opacity, 0.12));
+  }
+
+  .accordion--border-solid .accordion-row:first-child {
+    border-top: var(--accordion-border-width, 1px) solid rgba(var(--color-foreground), var(--accordion-border-opacity, 0.12));
+  }
+
+  /* Card style */
+  .accordion--style-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Prevent color scheme from painting the wrapper background */
+  .accordion--style-card[class*="color-"] {
+    background-color: transparent;
+  }
+
+  .accordion--style-card .accordion-row {
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    border-radius: var(--accordion-border-radius, 0);
+  }
+
+  .accordion--style-card .accordion-row__header {
+    padding-top: var(--row-padding-top, 16px);
+    padding-bottom: var(--row-padding-bottom, 16px);
+    padding-left: calc(var(--row-padding-left, 0px) + 20px);
+    padding-right: calc(var(--row-padding-right, 0px) + 20px);
+  }
+
+  .accordion--style-card .accordion-row__content {
+    padding-top: 0;
+    padding-bottom: var(--row-padding-bottom, 16px);
+    padding-left: calc(var(--row-padding-left, 0px) + 20px);
+    padding-right: calc(var(--row-padding-right, 0px) + 20px);
+  }
+
+  /* Card + border solid */
+  .accordion--style-card.accordion--border-solid .accordion-row {
+    border: var(--accordion-border-width, 1px) solid rgba(var(--color-foreground), var(--accordion-border-opacity, 0.12));
+  }
+
+  @media screen and (max-width: 749px) {
+    accordion-group {
+      width: var(--accordion-width-mobile, var(--accordion-width, 100%));
+    }
+
+    .accordion-block {
+      padding-top: calc(var(--accordion-padding-top, 0) * var(--accordion-mobile-scale, 0.8));
+      padding-bottom: calc(var(--accordion-padding-bottom, 0) * var(--accordion-mobile-scale, 0.8));
+      padding-left: calc(var(--accordion-padding-left, 0) * var(--accordion-mobile-scale, 0.8));
+      padding-right: calc(var(--accordion-padding-right, 0) * var(--accordion-mobile-scale, 0.8));
+    }
+
+    .accordion-row__header {
+      padding-top: calc(var(--row-padding-top, 16px) * var(--row-mobile-scale, 0.8));
+      padding-bottom: calc(var(--row-padding-bottom, 16px) * var(--row-mobile-scale, 0.8));
+      padding-left: calc(var(--row-padding-left, 0px) * var(--row-mobile-scale, 0.8));
+      padding-right: calc(var(--row-padding-right, 0px) * var(--row-mobile-scale, 0.8));
+    }
+
+    .accordion-row__content {
+      padding-bottom: calc(var(--row-padding-bottom, 16px) * var(--row-mobile-scale, 0.8));
+      padding-left: calc(var(--row-padding-left, 0px) * var(--row-mobile-scale, 0.8));
+      padding-right: calc(var(--row-padding-right, 0px) * var(--row-mobile-scale, 0.8));
+    }
+
+    .accordion--style-card .accordion-row__header {
+      padding-left: calc(calc(var(--row-padding-left, 0px) * var(--row-mobile-scale, 0.8)) + 20px);
+      padding-right: calc(calc(var(--row-padding-right, 0px) * var(--row-mobile-scale, 0.8)) + 20px);
+    }
+
+    .accordion--style-card .accordion-row__content {
+      padding-left: calc(calc(var(--row-padding-left, 0px) * var(--row-mobile-scale, 0.8)) + 20px);
+      padding-right: calc(calc(var(--row-padding-right, 0px) * var(--row-mobile-scale, 0.8)) + 20px);
+    }
+  }
+{% endstylesheet %}
+
+{%- liquid
+  assign s = block.settings
+  assign icon = s.icon
+
+  case s.width
+    when 'fill'
+      assign width_value = '100%'
+    when 'custom'
+      assign width_value = s.custom_width | append: '%'
+    else
+      assign width_value = 'fit-content'
+  endcase
+
+  case s.width_mobile
+    when 'fill'
+      assign width_mobile_value = '100%'
+    when 'custom'
+      assign width_mobile_value = s.custom_width_mobile | append: '%'
+    else
+      assign width_mobile_value = 'fit-content'
+  endcase
+-%}
+
+{%- capture children -%}
+  {% content_for 'blocks' %}
+{%- endcapture -%}
+
+<script src="{{ 'accordion-custom.js' | asset_url }}" defer="defer"></script>
+
+<accordion-group
+  data-open-behavior="{{ s.open_behavior }}"
+  style="
+    --accordion-width: {{ width_value }};
+    --accordion-width-mobile: {{ width_mobile_value }};
+  "
+>
+  <div
+    class="accordion-block accordion--icon-{{ icon }} accordion--icon-style-{{ s.icon_style }} accordion--heading-{{ s.heading_tag }} accordion--style-{{ s.style }}{% if s.border_style == 'solid' %} accordion--border-solid{% endif %}{% if s.style == 'card' %} color-{{ s.color_scheme }}{% endif %}"
+    style="
+      --accordion-border-radius: {{ s.border_radius }}px;
+      --accordion-border-width: {{ s.border_width }}px;
+      --accordion-border-opacity: {{ s.border_opacity | divided_by: 100.0 }};
+      --accordion-padding-top: {{ s.padding_top }}px;
+      --accordion-padding-bottom: {{ s.padding_bottom }}px;
+      --accordion-padding-left: {{ s.padding_left }}px;
+      --accordion-padding-right: {{ s.padding_right }}px;
+      --accordion-mobile-scale: {{ s.mobile_scale | divided_by: 100.0 }};
+      --row-padding-top: {{ s.row_padding_top }}px;
+      --row-padding-bottom: {{ s.row_padding_bottom }}px;
+      --row-padding-left: {{ s.row_padding_left }}px;
+      --row-padding-right: {{ s.row_padding_right }}px;
+      --row-mobile-scale: {{ s.row_mobile_scale | divided_by: 100.0 }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    {{ children }}
+  </div>
+</accordion-group>
+
+{% schema %}
+{
+  "name": "Accordion",
+  "tag": null,
+  "blocks": [
+    { "type": "_accordion-row" }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "open_behavior",
+      "label": "Open behavior",
+      "options": [
+        {
+          "value": "multiple",
+          "label": "Multiple"
+        },
+        {
+          "value": "single",
+          "label": "Single"
+        }
+      ],
+      "default": "multiple"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:settings.style",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "card",
+          "label": "Card"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1",
+      "visible_if": "{{ block.settings.style == 'card' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading preset",
+      "options": [
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        },
+        {
+          "value": "p",
+          "label": "t:options.paragraph"
+        }
+      ],
+      "default": "h5"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "Icon",
+      "options": [
+        {
+          "value": "plus",
+          "label": "Plus"
+        },
+        {
+          "value": "chevron",
+          "label": "Chevron"
+        },
+        {
+          "value": "caret",
+          "label": "Caret"
+        }
+      ],
+      "default": "plus"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icon style",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default"
+        },
+        {
+          "value": "solid",
+          "label": "Solid"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "header",
+      "content": "Borders"
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "Border style",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "t:settings.border_width",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1,
+      "visible_if": "{{ block.settings.border_style == 'solid' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "label": "t:settings.border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 12,
+      "visible_if": "{{ block.settings.border_style == 'solid' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:settings.border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Row padding"
+    },
+    {
+      "type": "range",
+      "id": "row_padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "row_padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "row_padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "row_padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "row_mobile_scale",
+      "label": "Mobile scale",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_scale",
+      "label": "Mobile scale",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "Accordion",
+      "category": "Layout",
+      "blocks": [
+        {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "Accordion row 1",
+            "open_by_default": true
+          },
+          "blocks": [
+            {
+              "type": "text",
+              "settings": {
+                "text": "<p>Share information about your brand with your customers.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "Accordion row 2"
+          },
+          "blocks": [
+            {
+              "type": "text",
+              "settings": {
+                "text": "<p>Share information about your brand with your customers.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "Accordion row 3"
+          },
+          "blocks": [
+            {
+              "type": "text",
+              "settings": {
+                "text": "<p>Share information about your brand with your customers.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

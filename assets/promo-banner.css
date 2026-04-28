@@ -1,0 +1,165 @@
+.promo--banner-inner {
+  display: grid;
+  overflow: hidden;
+  position: relative;
+  z-index: 8;
+}
+.promo--banner-height-small{
+  min-height: 30rem;
+}
+.promo--banner-height-large{
+  min-height: 30rem;
+  @media only screen and (min-width: 992px){
+     min-height: 50rem;
+  }
+}
+.promo--banner-border.promo-banner-border-place-inside:before {
+    outline: .1rem dashed rgba(var(--color-foreground),.25);
+    outline-offset: -1.5rem;
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+@media only screen and (min-width: 750px) {
+  .promo--banner-inner:not(.not-promo--banner-grid) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.promo--banner-content--heading {
+  font-size: 4rem;
+  font-weight: 700;
+}
+.promo--banner-content--subheading {
+  font-size: 2rem;
+  letter-spacing: 0.3rem;
+}
+.promo--banner-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+.promo--banner-media {
+  height: 100%;
+  z-index: -1;
+}
+@media only screen and (min-width: 992px) {
+  .promo--banner-content--subheading {
+    font-size: 2.6rem;
+    letter-spacing: 0.5rem;
+  }
+  .promo--banner-content--heading {
+    font-size: 9rem;
+    font-weight: bold;
+  }
+  .promo--banner-content-left {
+    text-align: left;
+  }
+  .promo--banner-content-right {
+    text-align: right;
+  }
+  .promo--banner-content-center {
+    text-align: center;
+  }
+}
+.promo--banner-media-wrapper {
+  position: relative;
+}
+.promo--banner-content--heading-sub, .promo-timer-heading.storke--title > strong {
+  color: rgba(var(--color-background));
+  text-shadow: -2px 2px 0 rgba(var(--color-foreground)),
+    2px 2px 0 rgba(var(--color-foreground)),
+    2px -2px 0 rgba(var(--color-foreground)),
+    -2px -2px 0 rgba(var(--color-foreground));
+}
+.promo--banner-media-link {
+  display: block;
+  height: 100%;
+}
+span.link.promo--banner-content--button--link {
+  cursor: inherit;
+}
+@media only screen and (max-width: 749px) {
+  .promo--banner-media-wrapper {
+    min-height: 25rem;
+  }
+  .promo--banner-content {
+    order: 2;
+  }
+}
+.promo--banner-inner.rounded--box {
+  border-radius: var(--promo-banner-radius, 1rem);
+}
+/* Promo banner timer css */
+
+/* Timer wrapper styling - horizontal layout with equal width columns */
+.promo--banner-timer-wrapper {
+  display: flex;
+  padding: 3rem;
+  gap: 2rem;
+  justify-content: var(--timer-content-space-between, space-between);
+  @media only screen and (max-width: 749px){
+    flex-wrap: wrap;
+    align-items: var(--timer-content-mobile-alignment);
+  }
+  @media only screen and (min-width: 750px){
+    align-items: var(--timer-content-alignment);
+  }
+}
+.promo--banner-border.promo-banner-border-place-outside {
+  border: 0.1rem solid rgba(var(--color-foreground),.25);
+}
+.promo--banner-timer-wrapper:not(.promo--timer-vertical) .promo--banner-timer-wrapper > * {
+  @media only screen and (min-width: 750px){
+    flex: 1;
+  }
+}
+.promo-banner-timer {
+    justify-content: center;
+    gap: 4rem;
+}
+.promo--timer-button-wrapper {
+    text-align: end;
+}
+.promo-timer-heading {
+  margin-bottom: 0;
+}
+.promo-timer-heading + .promo-timer-description{
+  margin-top: 1.2rem;
+}
+.promo-banner-timer .countdown__inner {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+}
+
+.promo-banner-timer .countdown__inner .countdown__digit {
+    font-size: 2rem;
+    color: rgba(var(--color-foreground));
+    position: relative;
+}
+
+.promo-banner-timer .countdown__inner .countdown__digit::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 0.1rem;
+    background: rgba(var(--color-foreground),0.3);
+    inset-inline-start: 0;
+    bottom: -0.25rem;
+}
+
+.timer--label-uppercase .countdown__inner .countdown__labels {
+    text-transform: uppercase;
+}
+.promo-banner-timer-content:empty {
+  display: none;
+}
+.promo--banner-timer-wrapper.promo--timer-vertical {
+  flex-direction: column;
+}

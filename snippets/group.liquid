@@ -1,0 +1,105 @@
+{%- doc -%}
+  Renders a group block wrapper.
+
+  @param {string} children - The block children
+  @param {object} settings - block.settings
+  @param {string} shopify_attributes - block.shopify_attributes
+{%- enddoc -%}
+
+{%- liquid
+  assign color_class = ''
+  unless settings.inherit_color_scheme
+    assign color_class = 'color-' | append: settings.color_scheme
+  endunless
+
+  case settings.width
+    when 'fill'
+      assign width_val = '100%'
+    when 'custom'
+      assign width_val = settings.custom_width | append: '%'
+    else
+      assign width_val = 'fit-content'
+  endcase
+
+  case settings.width_mobile
+    when 'fill'
+      assign width_mobile_val = '100%'
+    when 'custom'
+      assign width_mobile_val = settings.custom_width_mobile | append: '%'
+    else
+      assign width_mobile_val = 'fit-content'
+  endcase
+
+  case settings.height
+    when 'fill'
+      assign height_val = '100%'
+    when 'custom'
+      assign height_val = settings.custom_height | append: '%'
+    else
+      assign height_val = 'fit-content'
+  endcase
+-%}
+
+{%- if settings.link != blank -%}
+  <a
+    href="{{ settings.link }}"
+    {% if settings.open_in_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
+    class="group-link"
+  >
+{%- endif -%}
+
+<div
+  class="group-container {{ color_class }}"
+  style="
+    --group-width: {{ width_val }};
+    --group-width-mobile: {{ width_mobile_val }};
+    --group-height: {{ height_val }};
+    {% render 'flex-layout', settings: settings %}
+    {% render 'visual-style-vars', settings: settings %}
+  "
+  {{ shopify_attributes }}
+>
+  {% render 'visual-style-elements', settings: settings %}
+
+  <div class="border-style group-content flex-container">
+    {{ children }}
+  </div>
+</div>
+
+{%- if settings.link != blank -%}
+  </a>
+{%- endif -%}
+
+{% stylesheet %}
+  .group-container {
+    position: relative;
+    width: var(--group-width, 100%);
+    height: var(--group-height, fit-content);
+    padding-block-start: var(--padding-block-start, 0);
+    padding-block-end: var(--padding-block-end, 0);
+    padding-inline-start: var(--padding-inline-start, 0);
+    padding-inline-end: var(--padding-inline-end, 0);
+  }
+
+  .group-content {
+    position: relative;
+    z-index: var(--layer-flat, 2);
+    height: 100%;
+  }
+
+  .group-link {
+    text-decoration: none;
+    color: inherit;
+    display: contents;
+  }
+
+  @media screen and (max-width: 749px) {
+    .group-container {
+      width: var(--group-width-mobile, var(--group-width, 100%));
+      padding-block-start: calc(var(--padding-block-start, 0) * var(--padding-mobile-scale, 1));
+      padding-block-end: calc(var(--padding-block-end, 0) * var(--padding-mobile-scale, 1));
+      padding-inline-start: calc(var(--padding-inline-start, 0) * var(--padding-mobile-scale, 1));
+      padding-inline-end: calc(var(--padding-inline-end, 0) * var(--padding-mobile-scale, 1));
+    }
+  }
+{% endstylesheet %}

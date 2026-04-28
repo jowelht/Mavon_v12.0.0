@@ -1,0 +1,183 @@
+{% stylesheet %}
+  .icon-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--icon-block-width, 2.4rem);
+    height: auto;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .icon-block svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .icon-block img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+{% endstylesheet %}
+
+{%- liquid
+  assign icon = block.settings.icon
+  assign image_icon = block.settings.image_icon
+  assign width = block.settings.width
+  assign link = block.settings.link
+  assign open_in_new_tab = block.settings.open_in_new_tab
+  assign color = block.settings.color
+  assign width_rem = width | times: 0.1
+  assign size_style = '--icon-block-width: ' | append: width_rem | append: 'rem;'
+  if color != blank
+    assign size_style = size_style | append: ' color: ' | append: color | append: ';'
+  endif
+-%}
+
+{%- capture icon_content -%}
+  {%- if image_icon != blank -%}
+    {{- image_icon | image_url: width: 200 | image_tag:
+      loading: 'lazy',
+      widths: '24, 48, 64, 96, 128, 200'
+    -}}
+  {%- elsif icon != 'none' -%}
+    {%- case icon -%}
+      {%- when 'twitter' -%}
+        {%- render 'icon-twitter' -%}
+      {%- when 'facebook' -%}
+        {%- render 'icon-facebook' -%}
+      {%- when 'instagram' -%}
+        {%- render 'icon-instagram' -%}
+      {%- when 'pinterest' -%}
+        {%- render 'icon-pinterest' -%}
+      {%- when 'tiktok' -%}
+        {%- render 'icon-tiktok' -%}
+      {%- when 'youtube' -%}
+        {%- render 'icon-youtube' -%}
+      {%- when 'snapchat' -%}
+        {%- render 'icon-snapchat' -%}
+      {%- when 'tumblr' -%}
+        {%- render 'icon-tumblr' -%}
+      {%- when 'vimeo' -%}
+        {%- render 'icon-vimeo' -%}
+      {%- else -%}
+        {%- render 'icon-features', icon: icon -%}
+    {%- endcase -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if link != blank -%}
+  <a
+    href="{{ link }}"
+    class="icon-block"
+    style="{{ size_style }}"
+    {% if open_in_new_tab %}target="_blank" rel="noopener"{% endif %}
+    {{ block.shopify_attributes }}
+  >
+    {{- icon_content -}}
+  </a>
+{%- else -%}
+  <span
+    class="icon-block"
+    style="{{ size_style }}"
+    {{ block.shopify_attributes }}
+  >
+    {{- icon_content -}}
+  </span>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Icon",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "Icon",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "truck", "label": "Truck" },
+        { "value": "award", "label": "Award" },
+        { "value": "alarm", "label": "Alarm" },
+        { "value": "camera", "label": "Camera" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Clock" },
+        { "value": "compass", "label": "Compass" },
+        { "value": "card", "label": "Credit card" },
+        { "value": "dollar", "label": "Dollar" },
+        { "value": "gift", "label": "Gift" },
+        { "value": "lock", "label": "Lock" },
+        { "value": "map", "label": "Map" },
+        { "value": "mic", "label": "Mic" },
+        { "value": "monitor", "label": "Monitor" },
+        { "value": "phone", "label": "Phone" },
+        { "value": "cart", "label": "Cart" },
+        { "value": "bag", "label": "Shopping bag" },
+        { "value": "smart_phone", "label": "Smart phone" },
+        { "value": "smile", "label": "Smile" },
+        { "value": "sun", "label": "Sun" },
+        { "value": "thumbs_up", "label": "Thumbs up" },
+        { "value": "thumbs_down", "label": "Thumbs down" },
+        { "value": "user", "label": "User" },
+        { "value": "users", "label": "Users" },
+        { "value": "watch", "label": "Watch" },
+        { "value": "price_tag", "label": "Price tag" },
+        { "value": "twitter", "label": "Twitter" },
+        { "value": "facebook", "label": "Facebook" },
+        { "value": "instagram", "label": "Instagram" },
+        { "value": "pinterest", "label": "Pinterest" },
+        { "value": "tiktok", "label": "TikTok" },
+        { "value": "youtube", "label": "YouTube" },
+        { "value": "snapchat", "label": "Snapchat" },
+        { "value": "tumblr", "label": "Tumblr" },
+        { "value": "vimeo", "label": "Vimeo" }
+      ],
+      "default": "price_tag"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_icon",
+      "label": "Image icon"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "Width",
+      "min": 12,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Color",
+      "alpha": true
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "Open link in new tab",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Icon",
+      "category": "Basic",
+      "settings": {
+        "icon": "price_tag"
+      }
+    }
+  ]
+}
+{% endschema %}

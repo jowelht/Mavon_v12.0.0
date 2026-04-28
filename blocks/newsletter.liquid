@@ -1,0 +1,437 @@
+{% stylesheet %}
+  .newsletter-block {
+    display: flex;
+    flex-direction: column;
+    width: var(--nl-block-width, 100%);
+    align-items: var(--nl-align, flex-start);
+    padding-top: var(--nl-padding-top, 0);
+    padding-bottom: var(--nl-padding-bottom, 0);
+    padding-left: var(--nl-padding-left, 0);
+    padding-right: var(--nl-padding-right, 0);
+  }
+
+  .newsletter-block__form {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .newsletter-block .input__field_form {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .newsletter-block .input__field {
+    flex: 1;
+    height: 5.5rem;
+    padding: 0 10rem 0 1.5rem;
+    border-radius: var(--nl-input-radius, 3rem);
+    background-color: transparent;
+    margin-bottom: 0;
+  }
+
+  /* Border: All */
+  .newsletter-block--border-all .input__field {
+    border: 1px solid rgba(var(--color-foreground), 0.55);
+  }
+
+  /* Border: Underline */
+  .newsletter-block--border-underline .input__field {
+    border: none;
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.55);
+    border-radius: 0;
+  }
+
+  /* Border: None */
+  .newsletter-block--border-none .input__field {
+    border: none;
+  }
+
+  /* Submit button base */
+  .newsletter-block .input__field_form_button {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-weight: var(--button-font-weight);
+    color: rgba(var(--color-foreground));
+    cursor: pointer;
+    padding: 0.8rem 1.6rem;
+    line-height: 1;
+  }
+
+  /* Button: Primary */
+  .newsletter-block--btn-primary .input__field_form_button {
+    background: rgba(var(--color-button), var(--alpha-button-background));
+    color: rgb(var(--color-button-text));
+    border-radius: var(--nl-input-radius, 3rem);
+    border: none;
+  }
+
+  /* Button: Secondary */
+  .newsletter-block--btn-secondary .input__field_form_button {
+    background: transparent;
+    border: 1px solid rgba(var(--color-button), var(--alpha-button-border));
+    color: rgb(var(--color-button-text));
+    border-radius: var(--nl-input-radius, 3rem);
+  }
+
+  /* Button: Text */
+  .newsletter-block--btn-text .input__field_form_button {
+    background: none;
+    border: none;
+    color: rgba(var(--color-foreground));
+    padding: 0 1rem;
+  }
+
+  /* Arrow icon */
+  .newsletter-block .input__field_form_button svg {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  /* Terms */
+  .newsletter-block__terms {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    opacity: 0.7;
+  }
+  .newsletter-block__terms a {
+    text-decoration: underline;
+  }
+
+  /* Messages */
+  .newsletter-block .newsletter-form__message {
+    margin-top: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  @media screen and (max-width: 749px) {
+    .newsletter-block {
+      width: var(--nl-block-width-mobile, var(--nl-block-width, 100%));
+      padding-top: calc(var(--nl-padding-top, 0) * var(--nl-mobile-scale, 1));
+      padding-bottom: calc(var(--nl-padding-bottom, 0) * var(--nl-mobile-scale, 1));
+      padding-left: calc(var(--nl-padding-left, 0) * var(--nl-mobile-scale, 1));
+      padding-right: calc(var(--nl-padding-right, 0) * var(--nl-mobile-scale, 1));
+    }
+  }
+{% endstylesheet %}
+
+{%- liquid
+  # Alignment
+  assign alignment = block.settings.alignment
+
+  # Input
+  assign border_style = block.settings.border_style
+  assign border_radius_rem = block.settings.border_radius | times: 0.1
+  assign text_preset = block.settings.text_preset
+
+  # Button
+  assign button_style = block.settings.button_style
+  assign button_display = block.settings.button_display
+  assign button_label = block.settings.button_label
+
+  # Terms
+  assign terms = block.settings.terms
+
+  # Dimensions
+  case block.settings.width
+    when 'custom'
+      assign width_value = block.settings.width_custom | append: '%'
+    else
+      assign width_value = '100%'
+  endcase
+
+  case block.settings.width_mobile
+    when 'custom'
+      assign width_mobile_value = block.settings.width_mobile_custom | append: '%'
+    else
+      assign width_mobile_value = '100%'
+  endcase
+
+  # Padding
+  assign pt_rem = block.settings.padding_top | times: 0.1
+  assign pb_rem = block.settings.padding_bottom | times: 0.1
+  assign pl_rem = block.settings.padding_left | times: 0.1
+  assign pr_rem = block.settings.padding_right | times: 0.1
+  assign mobile_scale = block.settings.mobile_scale | divided_by: 100.0
+-%}
+
+<div
+  class="newsletter-block newsletter-block--border-{{ border_style }} newsletter-block--btn-{{ button_style }}"
+  style="
+    --nl-align: {{ alignment }};
+    --nl-input-radius: {{ border_radius_rem }}rem;
+    --nl-block-width: {{ width_value }};
+    --nl-block-width-mobile: {{ width_mobile_value }};
+    --nl-padding-top: {{ pt_rem }}rem;
+    --nl-padding-bottom: {{ pb_rem }}rem;
+    --nl-padding-left: {{ pl_rem }}rem;
+    --nl-padding-right: {{ pr_rem }}rem;
+    --nl-mobile-scale: {{ mobile_scale }};
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="newsletter-block__form">
+    {%- form 'customer', class: 'newsletter-form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <div class="newsletter-form__field-wrapper">
+        <div class="input__field_form">
+          <label class="field__label visually-hidden" for="NewsletterBlock--{{ block.id }}">
+            {{ 'newsletter.label' | t }}
+          </label>
+          <input
+            id="NewsletterBlock--{{ block.id }}"
+            type="email"
+            name="contact[email]"
+            class="input__field {{ text_preset }}"
+            value="{{ form.email }}"
+            aria-required="true"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            placeholder="{{ 'newsletter.label' | t }}"
+            required
+          >
+          <button type="submit" class="input__field_form_button" name="commit">
+            {%- if button_display == 'arrow' -%}
+              {%- render 'icon-arrow' -%}
+            {%- else -%}
+              {{ button_label }}
+            {%- endif -%}
+          </button>
+        </div>
+      </div>
+      {%- if form.errors -%}
+        <small class="newsletter-form__message form__message">
+          {%- render 'icon-error' -%}
+          {{ form.errors.messages.email }}
+        </small>
+      {%- endif -%}
+      {%- if form.posted_successfully? -%}
+        <h3 class="newsletter-form__message newsletter-form__message--success">
+          {%- render 'icon-success' -%}
+          {{ 'newsletter.success' | t }}
+        </h3>
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+
+  {%- if terms != blank -%}
+    <div class="newsletter-block__terms rte">
+      {{ terms }}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "header",
+      "content": "Input"
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "Border",
+      "options": [
+        { "value": "all", "label": "All" },
+        { "value": "underline", "label": "Underline" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 30,
+      "visible_if": "{{ block.settings.border_style == 'all' }}"
+    },
+    {
+      "type": "select",
+      "id": "text_preset",
+      "label": "Text preset",
+      "options": [
+        { "value": "rte", "label": "Paragraph" },
+        { "value": "h3", "label": "Heading 3" },
+        { "value": "h4", "label": "Heading 4" },
+        { "value": "h5", "label": "Heading 5" },
+        { "value": "h6", "label": "Heading 6" }
+      ],
+      "default": "rte"
+    },
+    {
+      "type": "header",
+      "content": "Submit button"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Style",
+      "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" },
+        { "value": "text", "label": "Text" }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "select",
+      "id": "button_display",
+      "label": "Display",
+      "options": [
+        { "value": "text", "label": "Text" },
+        { "value": "arrow", "label": "Arrow" }
+      ],
+      "default": "text"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Label",
+      "default": "Sign up",
+      "visible_if": "{{ block.settings.button_display == 'text' }}"
+    },
+    {
+      "type": "header",
+      "content": "Terms & policy"
+    },
+    {
+      "type": "richtext",
+      "id": "terms",
+      "label": "Terms and policy",
+      "default": "<p>By subscribing you agree to the <a href=\"#\">Terms of Use</a> & <a href=\"#\">Privacy Policy.</a></p>",
+      "info": "Add links to your privacy policy or terms of service"
+    },
+    {
+      "type": "header",
+      "content": "Size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "width_custom",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "Mobile width",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "width_mobile_custom",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_scale",
+      "label": "Mobile scale",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter",
+      "category": "Forms"
+    }
+  ]
+}
+{% endschema %}

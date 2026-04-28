@@ -1,0 +1,69 @@
+{% comment %}
+  Reusable button for theme blocks.
+
+  Accepts:
+  - link: {String} URL to link to (passed explicitly)
+  - block: {Object} The block context (implicit from Shopify)
+
+  Usage:
+    {% render 'button', link: block.settings.link %}
+{% endcomment %}
+
+{%- liquid
+  assign label = block.settings.label
+  assign style = block.settings.style_class
+  assign width_setting = block.settings.width
+  assign width_mobile_setting = block.settings.width_mobile
+
+  case style
+    when 'button-secondary'
+      assign button_class = 'button button--secondary'
+    when 'link'
+      assign button_class = 'link'
+    else
+      assign button_class = 'button'
+  endcase
+-%}
+
+<a
+  {% if link == blank %}
+    role="link"
+    aria-disabled="true"
+  {% else %}
+    href="{{ link }}"
+  {% endif %}
+  class="{{ button_class }}"
+  {% if width_setting == 'custom' or width_mobile_setting == 'custom' %}
+    style="
+      {%- if width_setting == 'custom' -%}
+        --button-width: {{ block.settings.custom_width }}%;
+      {%- endif -%}
+      {%- if width_mobile_setting == 'custom' -%}
+        --button-width-mobile: {{ block.settings.custom_width_mobile }}%;
+      {%- endif -%}
+    "
+  {% endif %}
+  {% if block.settings.open_in_new_tab %}
+    target="_blank"
+    rel="noopener noreferrer"
+  {% endif %}
+  {{ block.shopify_attributes }}
+>
+  {{- label | escape -}}
+</a>
+
+{% stylesheet %}
+  .custom-section-content .button,
+  .custom-section-content .link {
+    width: var(--button-width, fit-content);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  @media screen and (max-width: 749px) {
+    .custom-section-content .button,
+    .custom-section-content .link {
+      width: var(--button-width-mobile, var(--button-width, fit-content));
+    }
+  }
+{% endstylesheet %}

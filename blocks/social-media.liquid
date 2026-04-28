@@ -1,0 +1,237 @@
+{% stylesheet %}
+  .social-media-block {
+    width: var(--social-block-width, 100%);
+    padding-top: var(--social-padding-top, 0);
+    padding-bottom: var(--social-padding-bottom, 0);
+    padding-left: var(--social-padding-left, 0);
+    padding-right: var(--social-padding-right, 0);
+  }
+  .social-media-block .list-social {
+    gap: var(--social-gap, 1rem);
+    flex-wrap: wrap;
+  }
+  .social-media-block .list-social__link {
+    padding: 0;
+  }
+  .social-media-block .list-social__link.link {
+    width: auto;
+  }
+  .social-media-block .list-social__link .icon {
+    width: var(--social-icon-width, 1.7rem);
+    height: auto;
+  }
+
+  @media screen and (max-width: 749px) {
+    .social-media-block {
+      width: var(--social-block-width-mobile, var(--social-block-width, 100%));
+      padding-top: calc(var(--social-padding-top, 0) * var(--social-mobile-scale, 1));
+      padding-bottom: calc(var(--social-padding-bottom, 0) * var(--social-mobile-scale, 1));
+      padding-left: calc(var(--social-padding-left, 0) * var(--social-mobile-scale, 1));
+      padding-right: calc(var(--social-padding-right, 0) * var(--social-mobile-scale, 1));
+    }
+  }
+{% endstylesheet %}
+
+{{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  # Icon width
+  assign icon_width_style = ''
+  if block.settings.icon_width_type == 'custom'
+    assign icon_width_rem = block.settings.icon_width | times: 0.1
+    assign icon_width_style = '--social-icon-width: ' | append: icon_width_rem | append: 'rem;'
+  endif
+
+  # Gap
+  assign gap_rem = block.settings.gap | times: 0.1
+
+  # Width (Dimension group)
+  case block.settings.width
+    when 'custom'
+      assign width_value = block.settings.width_custom | append: '%'
+    else
+      assign width_value = '100%'
+  endcase
+
+  case block.settings.width_mobile
+    when 'custom'
+      assign width_mobile_value = block.settings.width_mobile_custom | append: '%'
+    else
+      assign width_mobile_value = '100%'
+  endcase
+
+  # Padding
+  assign pt_rem = block.settings.padding_top | times: 0.1
+  assign pb_rem = block.settings.padding_bottom | times: 0.1
+  assign pl_rem = block.settings.padding_left | times: 0.1
+  assign pr_rem = block.settings.padding_right | times: 0.1
+  assign mobile_scale = block.settings.mobile_scale | divided_by: 100.0
+-%}
+
+<div
+  class="social-media-block"
+  style="
+    --social-gap: {{ gap_rem }}rem;
+    {{ icon_width_style }}
+    --social-block-width: {{ width_value }};
+    --social-block-width-mobile: {{ width_mobile_value }};
+    --social-padding-top: {{ pt_rem }}rem;
+    --social-padding-bottom: {{ pb_rem }}rem;
+    --social-padding-left: {{ pl_rem }}rem;
+    --social-padding-right: {{ pr_rem }}rem;
+    --social-mobile-scale: {{ mobile_scale }};
+  "
+  {{ block.shopify_attributes }}
+>
+  {%- render 'social-media' -%}
+</div>
+
+{% schema %}
+{
+  "name": "Social media icons",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "To display your social media accounts, link them in your [theme settings](/admin/themes/current/editor?context=theme&category=social+media)."
+    },
+    {
+      "type": "select",
+      "id": "icon_width_type",
+      "label": "Icon width",
+      "options": [
+        { "value": "fit", "label": "Fit" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "range",
+      "id": "icon_width",
+      "label": "Icon width",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 20,
+      "visible_if": "{{ block.settings.icon_width_type == 'custom' }}"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "width_custom",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "Mobile width",
+      "options": [
+        { "value": "fill", "label": "Fill" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "width_mobile_custom",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_scale",
+      "label": "Mobile scale",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Social media icons",
+      "category": "Links"
+    }
+  ]
+}
+{% endschema %}

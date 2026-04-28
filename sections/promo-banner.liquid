@@ -1,0 +1,913 @@
+{{ 'promo-banner.css' | asset_url | stylesheet_tag }}
+{%- style -%}
+   .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.mobile_padding_top }}px;
+    padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+     --padding-top: {{ section.settings.mobile_padding_top }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+      --padding-top: {{ section.settings.padding_top }}px;
+    }
+  }
+  #MainContent > :first-child .section--top-space-{{ section.id }} {
+    padding-top: calc(var(--header-height) * var(--transparent-header-show) + var(--padding-top));
+  }
+
+  {% if section.settings.custom_colors %}
+    .promo--banner-{{ section.id }}{
+      --color-foreground: {{ section.settings.foreground.red }}, {{ section.settings.foreground.green }}, {{ section.settings.foreground.blue }};
+      --color-background: {{ section.settings.background.red }}, {{ section.settings.background.green }}, {{ section.settings.background.blue }};
+    }
+  {% endif %}
+{%- endstyle -%}
+<div class="promo--banner-wrapper section--top-space-{{ section.id }} section-{{ section.id }}-padding"
+{% if section.settings.round_corner %} style="--promo-banner-radius: {{ section.settings.corner_radius }}px;"{% endif %}
+>
+  <div class="container">
+    <div class="promo--banner-inner promo--banner-height-{{ section.settings.height }} {% if section.settings.border %}promo--banner-border promo-banner-border-place-{{ section.settings.border_placement }}{% endif %} {% if section.blocks.size == 1 %} not-promo--banner-grid{% endif %} color-{{ section.settings.color_scheme }} {% if section.settings.custom_colors  %} promo--banner-{{ section.id }} {% else %}gradient {% endif %} {% if section.settings.round_corner %} rounded--box{% endif %} {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'text' %}
+            <!-- Promo Banner Content -->
+            <div
+              class="promo--banner-content promo--banner-content-{{ block.settings.content_alignment }}"
+              {{ block.shopify_attributes }}
+            >
+              <div class="promo--banner-content--subheading">{{ block.settings.subheading }}</div>
+              <h2 class="promo--banner-content--heading {{ block.settings.heading_size }} mb-0">
+                <span class="promo--banner-content--heading">{{ block.settings.heading }}</span>
+                <span class="promo--banner-content--heading-sub">{{ block.settings.heading_stroke }}</span>
+              </h2>
+              {% if block.settings.button_label != blank %}
+                <div class="promo--banner-content--button">
+                  {% if block.settings.button_link != blank %}
+                    <a class="link promo--banner-content--button--link" href="{{ block.settings.button_link }}">
+                      {{ block.settings.button_label }}
+                    </a>
+                  {% else %}
+                    <span class="link promo--banner-content--button--link"> {{ block.settings.button_label }} </span>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <!-- Promo Banner Content ./ -->
+
+          {% when 'image' %}
+            <!-- Promo banner media -->
+            <div
+              class="promo--banner-media-wrapper {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {% if block.settings.banner_link != blank and block.settings.image != blank %}
+                <a href="{{ block.settings.banner_link }}" class="promo--banner-media-link">
+              {% endif %}
+              <div
+                class="promo--banner-media {% if block.settings.image != blank %}media{% else %} placeholder{% endif %}"
+              >
+                {%- if block.settings.image != blank -%}
+                  {%- capture sizes -%}{% if section.blocks.size == 1  %} (min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 }}px, (min-width: 750px) calc(100vw - 130px) {% else %}(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px, (min-width: 750px) calc((100vw - 130px) / 2){% endif %}, calc(100vw - 50px){%- endcapture -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 1500
+                    | image_tag:
+                      loading: 'lazy',
+                      sizes: sizes,
+                      widths: '165, 360, 535, 750, 1070, 1500, 1700, 2200, 3000'
+                  }}
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </div>
+              {% if block.settings.banner_link != blank and block.settings.image != blank %}
+                </a>
+              {% endif %}
+            </div>
+            <!-- Promo banner media ./ -->
+          {%  when 'timer' %}
+           <!-- Promo banner media -->
+           {% liquid
+              assign timer_content_alignment = 'center'
+              if block.settings.layout == 'vertical'
+                assign timer_content_alignment = block.settings.timer_content_alignment
+                assign timer_content_mobile_alignment = block.settings.timer_content_mobile_alignment
+              endif
+           %}
+            <div
+              class="promo--banner-timer-wrapper promo--timer-{{ block.settings.layout }}"
+              {{ block.shopify_attributes }}
+              style="
+              --timer-content-alignment: {{ timer_content_alignment }};
+              --timer-content-mobile-alignment: {{ timer_content_mobile_alignment }};
+              {% if block.settings.layout == 'vertical' %}
+              --timer-content-space-between: center;
+              {% endif %}
+              "
+            >
+              <div class="promo-banner-timer-content">
+                {%- if block.settings.subheading != blank -%}
+                <div class="promo-timer-subheading text__secondary">{{ block.settings.subheading }}</div>
+                {%- endif -%}
+                {%- if block.settings.heading != blank -%}
+                <h2 class="promo-timer-heading {{ block.settings.heading_size }}  storke--title">{{ block.settings.heading }}</h2>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <div class="promo-timer-description">{{ block.settings.text }}</div>
+                {%- endif -%}
+              </div>    
+              
+              {%- liquid
+                assign minutes_padded = block.settings.countdown_minutes | prepend: '00' | slice: -2, 2
+                assign seconds_padded = block.settings.countdown_seconds | prepend: '00' | slice: -2, 2
+                assign countdown_timer = block.settings.year | append: '-' | append: block.settings.countdown_month | append: '-' | append: block.settings.countdown_days | append: 'T' | append: block.settings.countdown_hours | append: ':' | append: minutes_padded | append: ':' | append: seconds_padded
+                assign countdown_timer_convert = countdown_timer | date: '%s'
+                assign today_date = 'now' | date: '%s'
+
+                assign timer = false
+                if countdown_timer_convert > today_date
+                  assign timer = true
+                endif
+
+                assign timer_label_letter_case = 'timer--label-' | append: block.settings.timer_text_style
+              -%}
+              <countdown-timer>
+                {% if timer %}
+                  <div
+                    class="promo-banner-timer {{ timer_label_letter_case }} d-flex"
+                    data-countdown="{{ block.settings.year }}-{{ block.settings.countdown_month }}-{{ block.settings.countdown_days }}T{{ block.settings.countdown_hours }}:{{ minutes_padded }}:{{ seconds_padded }}"
+                  >
+                    <div class="countdown-item Days">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">- -</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.days' | t }}</span>
+                      </div>
+                    </div>
+                    <div class="countdown-item Hrs">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">- -</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.hours' | t }}</span>
+                      </div>
+                    </div>
+                    <div class="countdown-item Min">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">- -</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.minutes' | t }}</span>
+                      </div>
+                    </div>
+                    <div class="countdown-item Sec">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">- -</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.seconds' | t }}</span>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="promo-banner-timer {{ timer_label_letter_case }} d-flex">
+                    <div class="countdown-item Days">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">00</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.days' | t }}</span>
+                      </div>
+                    </div>
+                    <div class="countdown-item Hrs">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">00</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.hours' | t }}</span>
+                      </div>
+                    </div>
+                    <div class="countdown-item Min">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">00</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.minutes' | t }}</span>
+                      </div>
+                    </div>
+                    <div class="countdown-item Sec">
+                      <div class="countdown__inner">
+                        <span class="countdown__digit">00</span>
+                        <span class="countdown__labels">{{ 'products.product.countdown_timer.seconds' | t }}</span>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </countdown-timer>
+          
+            {% liquid
+              if block.settings.button_type == 'primary'
+                assign button_class = 'button--primary'
+              else
+                assign button_class = 'button--secondary'
+              endif
+            %}
+            {%- if block.settings.button_label != blank -%}
+              <div class="promo--timer-button-wrapper">
+                <a
+                  {% if block.settings.button_link != blank %}
+                    href="{{ block.settings.button_link }}"
+                  {% endif %}
+                  class="button button--{{ block.settings.button_size }} {{ button_class }} {% if block.settings.button_icon %} button--with-icon{% endif %}"
+                  {% if block.settings.button_link == blank %}
+                    aria-disabled="true"
+                  {% endif %}
+                >
+                  {{ block.settings.button_label | escape }}
+
+                  {% if block.settings.button_icon %}
+                    <span class="button--icon button--icon-right"></span>
+                  {% endif %}
+                </a>
+              </div>
+            {%- endif -%}
+            </div>
+            <!-- Promo banner media ./ -->  
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Promo banner",
+  "class": "promo--banner-section",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Border"
+    },
+    {
+      "type": "checkbox",
+      "id": "border",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "border_placement",
+      "options": [
+        {
+          "value": "inside",
+          "label": "Inside"
+        },
+        {
+          "value": "outside",
+          "label": "Outside"
+        }
+      ],
+      "default": "inside",
+      "label": "Border placement"
+    },
+    {
+      "type": "checkbox",
+      "id": "round_corner",
+      "default": true,
+      "label": "Round the corners of the box"
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 10,
+      "visible_if": "{{ section.settings.round_corner }}"
+    },
+    {
+      "type": "header",
+      "content": "Banner height"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Auto"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.image-with-text.settings.height.options__2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.image-with-text.settings.height.options__3.label"
+        }
+      ],
+      "default": "small",
+      "label": "t:sections.image-with-text.settings.height.label"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+          "type": "paragraph",
+          "content": "Desktop"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding top",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding bottom",
+          "default": 50
+        },
+		{
+          "type": "paragraph",
+          "content": "Mobile"
+        },
+		{
+          "type": "range",
+          "id": "mobile_padding_top",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding top",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "mobile_padding_bottom",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding bottom",
+          "default": 50
+        },
+     {
+          "type": "header",
+          "content": "Colors"
+        },
+       {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "default": "background-2",
+        "label": "t:sections.header.settings.color_scheme.label"
+       },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Replace with your custom colors",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "foreground",
+      "default": "#121212",
+      "label": "Foreground color"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "default": "#fff",
+      "label": "Background color"
+    }
+  ],
+   "blocks": [
+      {
+        "type": "text",
+        "name": "Text",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "subheading",
+            "default": "LIMITED TIME OFFER",
+            "label": "Subheading"
+          },
+          {
+            "type": "text",
+            "id": "heading",
+            "default": "50%",
+            "label": "Heading"
+          },
+          {
+            "type": "text",
+            "id": "heading_stroke",
+            "default": "OFF",
+            "label": "Heading stroke"
+          },
+          {
+            "type": "select",
+            "id": "heading_size",
+            "options": [
+              {
+                "value": "h1",
+                "label": "t:sections.all.heading_size.options__h1.label"
+              },
+              {
+                "value": "h2",
+                "label": "t:sections.all.heading_size.options__h2.label"
+              },
+              {
+                "value": "h3",
+                "label": "t:sections.all.heading_size.options__h3.label"
+              }
+            ],
+            "default": "h2",
+            "label": "t:sections.all.heading_size.label"
+          },
+          {
+            "type": "text",
+            "id": "button_label",
+            "label": "Button label"
+          },
+          {
+            "type": "url",
+            "id": "button_link",
+            "label": "Button link"
+          },
+          {
+            "type": "select",
+            "id": "content_alignment",
+            "options": [
+              {
+                "value": "left",
+                "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__1.label"
+              },
+              {
+                "value": "center",
+                "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__2.label"
+              },
+              {
+                "value": "right",
+                "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__3.label"
+              }
+            ],
+            "default": "center",
+            "label": "Desktop content alignment"
+          }
+        ]
+      },
+      {
+          "type": "image",
+          "name": "Image",
+          "limit": 1,
+          "settings": [
+              {
+                "type": "image_picker",
+                "id": "image",
+                "label": "Image"
+              },
+              {
+                "type": "url",
+                "id": "banner_link",
+                "label": "Image link"
+              }
+          ]
+        },
+        {
+            "type": "timer",
+            "name": "Timer",
+            "limit": 1,
+            "settings": [
+            {
+              "type": "number",
+              "id": "year",
+                "label": "Year",
+              "info": "Write the year in the following format: 2025",
+              "placeholder": "2025"
+            },
+            {
+              "type": "select",
+              "id": "countdown_month",
+              "label": "Month",
+              "options": [
+                {
+                  "value": "01",
+                  "label": "Jan"
+                },
+                {
+                  "value": "02",
+                  "label": "Feb"
+                },
+                {
+                  "value": "03",
+                  "label": "Mar"
+                },
+                {
+                  "value": "04",
+                  "label": "Apr"
+                },
+                {
+                  "value": "05",
+                  "label": "May"
+                },
+                {
+                  "value": "06",
+                  "label": "Jun"
+                },
+                {
+                  "value": "07",
+                  "label": "Jul"
+                },
+                {
+                  "value": "08",
+                  "label": "Aug"
+                },
+                {
+                  "value": "09",
+                  "label": "Sept"
+                },
+                {
+                  "value": "10",
+                  "label": "Oct"
+                },
+                {
+                  "value": "11",
+                  "label": "Nov"
+                },
+                {
+                  "value": "12",
+                  "label": "Dec"
+                }
+              ],
+              "default": "01"
+            },
+            {
+              "type": "select",
+              "id": "countdown_days",
+              "label": "Day",
+              "options": [
+                {
+                  "value": "01",
+                  "label": "1"
+                },
+                {
+                  "value": "02",
+                  "label": "2"
+                },
+                {
+                  "value": "03",
+                  "label": "3"
+                },
+                {
+                  "value": "04",
+                  "label": "4"
+                },
+                {
+                  "value": "05",
+                  "label": "5"
+                },
+                {
+                  "value": "06",
+                  "label": "6"
+                },
+                {
+                  "value": "07",
+                  "label": "7"
+                },
+                {
+                  "value": "08",
+                  "label": "8"
+                },
+                {
+                  "value": "09",
+                  "label": "9"
+                },
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "11",
+                  "label": "11"
+                },
+                {
+                  "value": "12",
+                  "label": "12"
+                },
+                {
+                  "value": "13",
+                  "label": "13"
+                },
+                {
+                  "value": "14",
+                  "label": "14"
+                },
+                {
+                  "value": "15",
+                  "label": "15"
+                },
+                {
+                  "value": "16",
+                  "label": "16"
+                },
+                {
+                  "value": "17",
+                  "label": "17"
+                },
+                {
+                  "value": "18",
+                  "label": "18"
+                },
+                {
+                  "value": "19",
+                  "label": "19"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                },
+                {
+                  "value": "21",
+                  "label": "21"
+                },
+                {
+                  "value": "22",
+                  "label": "22"
+                },
+                {
+                  "value": "23",
+                  "label": "23"
+                },
+                {
+                  "value": "24",
+                  "label": "24"
+                },
+                {
+                  "value": "25",
+                  "label": "25"
+                },
+                {
+                  "value": "26",
+                  "label": "26"
+                },
+                {
+                  "value": "27",
+                  "label": "27"
+                },
+                {
+                  "value": "28",
+                  "label": "28"
+                },
+                {
+                  "value": "29",
+                  "label": "29"
+                },
+                {
+                  "value": "30",
+                  "label": "30"
+                },
+                {
+                  "value": "31",
+                  "label": "31"
+                }
+              ],
+              "default": "01"
+            },
+            {
+              "type": "select",
+              "id": "countdown_hours",
+              "label": "Hour",
+              "info": "24-hour format",
+              "options": [
+                { "value": "00", "label": "00 (12 AM)" },
+                { "value": "01", "label": "01 (1 AM)" },
+                { "value": "02", "label": "02 (2 AM)" },
+                { "value": "03", "label": "03 (3 AM)" },
+                { "value": "04", "label": "04 (4 AM)" },
+                { "value": "05", "label": "05 (5 AM)" },
+                { "value": "06", "label": "06 (6 AM)" },
+                { "value": "07", "label": "07 (7 AM)" },
+                { "value": "08", "label": "08 (8 AM)" },
+                { "value": "09", "label": "09 (9 AM)" },
+                { "value": "10", "label": "10 (10 AM)" },
+                { "value": "11", "label": "11 (11 AM)" },
+                { "value": "12", "label": "12 (12 PM)" },
+                { "value": "13", "label": "13 (1 PM)" },
+                { "value": "14", "label": "14 (2 PM)" },
+                { "value": "15", "label": "15 (3 PM)" },
+                { "value": "16", "label": "16 (4 PM)" },
+                { "value": "17", "label": "17 (5 PM)" },
+                { "value": "18", "label": "18 (6 PM)" },
+                { "value": "19", "label": "19 (7 PM)" },
+                { "value": "20", "label": "20 (8 PM)" },
+                { "value": "21", "label": "21 (9 PM)" },
+                { "value": "22", "label": "22 (10 PM)" },
+                { "value": "23", "label": "23 (11 PM)" }
+              ],
+              "default": "00"
+            },
+            {
+              "type": "range",
+              "id": "countdown_minutes",
+              "label": "Minute",
+              "min": 0,
+              "max": 59,
+              "step": 1,
+              "unit": "min",
+              "default": 0
+            },
+            {
+              "type": "range",
+              "id": "countdown_seconds",
+              "label": "Second",
+              "min": 0,
+              "max": 59,
+              "step": 1,
+              "unit": "sec",
+              "default": 0
+            },
+            {
+              "type": "select",
+              "id": "timer_text_style",
+              "options": [
+                {
+                  "value": "default",
+                  "label": "Default"
+                },
+                {
+                  "value": "uppercase",
+                  "label": "Uppercase"
+                }
+              ],
+              "default": "default",
+              "label": "Text transform"
+            },
+           
+            {
+              "type": "header",
+              "content": "Content settings"
+            },
+             {
+              "type": "select",
+              "id": "layout",
+              "options": [
+                {
+                  "value": "vertical",
+                  "label": "Vertical"
+                },
+                {
+                  "value": "horizontal",
+                  "label": "Horizontal"
+                }
+              ],
+              "default": "horizontal",
+              "label": "Layout"
+            },
+            {
+              "type": "select",
+              "id": "timer_content_alignment",
+              "options": [
+                {
+                  "value": "flex-start",
+                  "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__1.label"
+                },
+                {
+                  "value": "center",
+                  "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__2.label"
+                },
+                {
+                  "value": "flex-end",
+                  "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__3.label"
+                }
+              ],
+              "default": "center",
+              "label": "Desktop content alignment",
+              "visible_if": "{{ block.settings.layout == 'vertical' }}"
+            },
+            {
+              "type": "select",
+              "id": "timer_content_mobile_alignment",
+              "options": [
+                {
+                  "value": "flex-start",
+                  "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__1.label"
+                },
+                {
+                  "value": "center",
+                  "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__2.label"
+                },
+                {
+                  "value": "flex-end",
+                  "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__3.label"
+                }
+              ],
+              "default": "center",
+              "label": "Mobile content alignment",
+              "visible_if": "{{ block.settings.layout == 'vertical' }}"
+            },
+            {
+            "type": "inline_richtext",
+            "id": "heading",
+            "default": "Countdown timer",
+            "label": "t:sections.featured-collection.settings.title.label",
+            "info": "Use bold style to stroke text."
+            },
+            {
+              "type": "select",
+              "id": "heading_size",
+              "options": [
+                {
+                  "value": "h0",
+                  "label": "t:sections.all.heading_size.options__h0.label"
+                },
+                {
+                  "value": "h1",
+                  "label": "t:sections.all.heading_size.options__h1.label"
+                },
+                {
+                  "value": "h2",
+                  "label": "t:sections.all.heading_size.options__h2.label"
+                }
+              ],
+              "default": "h1",
+              "label": "t:sections.all.heading_size.label"
+            },
+            {
+              "type": "text",
+              "id": "subheading",
+              "default": "Add a tagline",
+              "label": "Subheading"
+            },
+            {
+              "type": "richtext",
+              "id": "text",
+              "label": "Text",
+              "default": "<p>Pair text with an image to focus on your chosen product, collection, or blog post.</p>"
+            },
+            {
+              "type": "text",
+              "id": "button_label",
+              "label": "Button label",
+            "default": "Shop now"
+            },
+            {
+              "type": "url",
+              "id": "button_link",
+              "label": "Button link"
+            },
+            {
+              "type": "select",
+              "id": "button_type",
+              "label": "Button type",
+              "default": "primary",
+              "options": [
+                {
+                  "value": "secondary",
+                  "label": "Secondary"
+                },
+                {
+                  "value": "primary",
+                  "label": "Primary"
+                }
+              ]
+            },
+            {
+              "type": "select",
+              "id": "button_size",
+              "label": "Button size",
+              "default": "large",
+              "options": [
+                {
+                  "value": "large",
+                  "label": "Large"
+                },
+                {
+                  "value": "medium",
+                  "label": "Medium"
+                },
+              {
+                  "value": "small",
+                  "label": "Small"
+                }
+              ]
+          }
+        ]
+      }
+   ],
+  "presets": [
+    {
+      "name": "Promo banner",
+      "category": "Banners",
+      "blocks":[
+          {
+            "type": "text"
+          },
+          {
+            "type": "image"
+          }
+      ]
+    }
+  ]
+}
+{% endschema %}
