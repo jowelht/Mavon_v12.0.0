@@ -110,6 +110,7 @@
                   {%- when '@app' -%}
                     {% render block %}
                   {% when 'discount' %}
+                    {{ 'component-cart-notification.css' | asset_url | stylesheet_tag }}
                     {% comment %} Cart Discount {% endcomment %}
                     {% render 'cart-discount' %}
                     {% comment %} Cart Discount End {% endcomment %}

@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -E '\\\\.\\(json|md|yml|yaml|js\\)$')"
+      "Bash(grep -E '\\\\.\\(json|md|yml|yaml|js\\)$')",
+      "Bash(grep -i \"\\\\.css$\\\\|\\\\.js$\")"
     ]
   }
 }
