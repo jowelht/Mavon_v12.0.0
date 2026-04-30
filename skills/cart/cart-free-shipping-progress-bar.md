@@ -1,6 +1,6 @@
 # Cart free shipping progress bar (Mavon theme)
 
-Blueprint for the **cart drawer free-shipping progress bar**: how it is built, wired to AJAX cart updates, customized in the theme editor, reused on other surfaces, and **styled as a compact card** in the cart drawer.
+Blueprint for the **free-shipping progress bar** (cart drawer **and** full cart page): how it is built, wired to AJAX cart updates, customized in the theme editor, and **styled as a compact card** using one snippet everywhere.
 
 ---
 
@@ -11,7 +11,7 @@ The feature compares `cart.total_price` to a configurable **minimum cart total**
 - A caption: either “amount away from free shipping” or “unlocked” — from **theme text settings** (with `{amount}`) or **locale** fallback
 - A horizontal bar whose fill reflects progress (0–100%) using a **merchant-defined gradient** (CSS variables)
 
-Rendering is **server-side Liquid** inside a reusable snippet. The bar stays in sync with the cart **without dedicated bar JavaScript** because the drawer is refreshed from Shopify Cart API responses that include section HTML.
+Rendering is **server-side Liquid** inside a single reusable snippet (`cart-free-shipping-bar`). The bar stays in sync with the cart **without dedicated bar JavaScript** because **section HTML is swapped** after cart operations: the **drawer** refreshes `cart-notification`, and the **cart page** refreshes `main-cart-items`, `main-cart-footer`, and `cart-live-region-text` (see `cart.js` / `cart-discount.js`).
 
 **This document includes:** visibility rules, money math, messaging and gradient logic, DOM/CSS architecture, **modern UI** notes (spacing, card container, motion, RTL), theme settings inventory, AJAX wiring, reuse checklist, and testing notes.
 
@@ -23,13 +23,14 @@ Rendering is **server-side Liquid** inside a reusable snippet. The bar stays in 
 |------|------|
 | Snippet (markup + math + a11y) | `snippets/cart-free-shipping-bar.liquid` |
 | Cart drawer integration point | `snippets/cart-notification-children.liquid` |
+| Cart **page** integration | `sections/main-cart-footer.liquid` — inside `.cart__blocks.js-contents` (same snippet) |
 | Cart drawer DOM shell | `snippets/cart-notification.liquid` |
 | Section file (minimal) | `sections/cart-notification.liquid` |
 | Styles (scoped BEM-ish classes) | `assets/component-cart-notification.css` |
 | Theme settings (enable, threshold, messages, gradient) | `config/settings_schema.json` → group **Cart** → header **Free Shipping Bar** (all `free_shipping_*` IDs) |
 | Copy (EN) | `locales/en.default.json` → `sections.cart.*` |
-| Stylesheet load | `sections/header.liquid` (and `sections/main-cart-footer.liquid` where applicable) |
-| Cart AJAX: section replacement | `assets/cart-notification.js`, `assets/product-form.js` |
+| Stylesheet load (bar CSS) | If `settings.free_shipping_bar_enable`: `sections/main-cart-footer.liquid`; cart **drawer** also loads via discount UI / header. Bar styles: `assets/component-cart-notification.css` |
+| Cart AJAX: section replacement | Drawer: `assets/cart-notification.js`, `assets/product-form.js`. Cart **page**: `assets/cart.js`, `assets/cart-discount.js` (both replace `main-cart-footer` `.js-contents`) |
 
 ---
 
@@ -74,7 +75,9 @@ Under `sections.cart` in `locales/en.default.json` (mirror keys in other locale 
 
 ---
 
-## Integration with the cart drawer
+## Integration: cart drawer and cart page
+
+### Cart drawer
 
 1. **Header** includes the drawer when `settings.cart_type == 'drawer'` and the template is not the cart page:
 
@@ -90,6 +93,16 @@ Under `sections.cart` in `locales/en.default.json` (mirror keys in other locale 
 
 So any change to cart lines or totals that triggers a **section re-render** automatically re-runs the snippet with an up-to-date `cart` object.
 
+### Cart page (`/cart`)
+
+1. **Footer section** `sections/main-cart-footer.liquid` renders the **same** snippet inside **`.cart__blocks.js-contents`** (the node whose `innerHTML` is replaced on updates).
+
+2. **Placement** matches the drawer pattern **discount → free shipping → totals** where possible: after the **discount** block if present; otherwise immediately before **subtotal**; if neither block exists in the section, the bar is rendered once at the end of `.js-contents` (before `cart-errors`).
+
+3. **Styles:** when `settings.free_shipping_bar_enable` is true, `component-cart-notification.css` is loaded from `main-cart-footer` so the bar matches the drawer even if the discount block (which also loads that asset) is removed.
+
+4. **Dynamic updates:** `assets/cart.js` (`cart-items` → `updateQuantity`) and `assets/cart-discount.js` (`renderCartPage`) both request refreshed section HTML for `main-cart-footer` and swap `.js-contents`, so totals/discounts and the **free-shipping bar** stay in sync.
+
 ---
 
 ## “Header” / shared logic (single source of truth)
@@ -102,9 +115,10 @@ There is **no separate header-only Liquid** for this bar in the current theme: *
 - `settings.free_shipping_success_message` — optional; blank falls back to `sections.cart.free_shipping_unlocked`
 - `settings.free_shipping_bar_gradient_start` / `settings.free_shipping_bar_gradient_end` — bar fill gradient (CSS variables on the fill element)
 
-**Reuse pattern for other UI (header announcement, cart page, PDP upsell, etc.):**
+**Reuse pattern for other UI (header announcement, PDP upsell, etc.):**
 
 - Render the same snippet: `{% render 'cart-free-shipping-bar' %}` anywhere the `cart` object is available and you want identical behavior.
+- The **cart page** already includes it via `main-cart-footer` inside `.js-contents` so AJAX cart updates refresh it automatically with `cart.js` / `cart-discount.js`.
 - Or, for a **static** header message, read the same `settings.free_shipping_threshold` and either duplicate the small Liquid math or extract a second snippet later—**keep one threshold in settings** so every surface stays aligned with checkout/shipping rules you communicate to customers.
 
 Locale strings under `sections.cart` keep messaging consistent across surfaces if you reference the same keys.
@@ -113,7 +127,9 @@ Locale strings under `sections.cart` keep messaging consistent across surfaces i
 
 ## Dynamic updates (AJAX behavior)
 
-The progress bar does **not** update itself with custom fetch logic. It updates because the theme **replaces the cart-notification section HTML** after cart operations.
+The progress bar does **not** update itself with custom fetch logic. It updates because the theme **replaces section HTML** that contains the snippet.
+
+### Cart drawer
 
 **Add to cart** (`assets/product-form.js`):
 
@@ -131,9 +147,20 @@ The progress bar does **not** update itself with custom fetch logic. It updates 
 
 Because `cart-notification-children` contains `{% render 'cart-free-shipping-bar' %}`, each successful response rebuilds the bar with correct percentages and copy.
 
-**Implications:**
+### Cart page
 
-- Adding this bar to **another section** only updates dynamically if that section’s id is included in the same Cart API `sections` array wherever the theme fetches cart updates (see `cart-items`/main-cart patterns for the cart **page**).
+**Line item quantity / remove** (`assets/cart.js`, `<cart-items>`):
+
+- POST to `routes.cart_change_url` with `sections` built from `getSectionsToRender()` — including `main-cart-footer` (`dataset.id`) and selector `.js-contents`.
+- Replaces the inner HTML of `#main-cart-footer .js-contents`, which includes the free-shipping snippet output from `main-cart-footer.liquid`.
+
+**Discount apply / remove** (`assets/cart-discount.js`, when `isCartPage`):
+
+- `renderCartPage` updates the same `#main-cart-footer .js-contents` (and `main-cart-items`, `cart-live-region-text`) from `parsedState.sections`.
+
+### Implications
+
+- Adding this bar to **another** section only updates dynamically if that section’s id is included in every relevant Cart API `sections` array (`product-form.js`, `cart-notification.js`, `cart.js`, `cart-discount.js`, etc.).
 - **PubSub** (`PUB_SUB_EVENTS.cartUpdate`) fires after updates but nothing in this feature subscribes for the bar—it relies on DOM replacement.
 
 ---
@@ -198,7 +225,8 @@ Single overview of the **shipped implementation** for anyone extending or debugg
 | Schema: enable, threshold, progress/success copy, gradient colors | `config/settings_schema.json` (**Cart** → **Free Shipping Bar**) |
 | Threshold math, `reached`, `%`, messages, gradient hex → CSS vars | `snippets/cart-free-shipping-bar.liquid` |
 | Drawer injection order | `snippets/cart-notification-children.liquid` — inside `#cart--drawer--footer`, **above** subtotal |
-| Section used in Cart API `sections` rebuild | `sections/cart-notification.liquid` → `cart-notification-children` |
+| Cart **page** injection | `sections/main-cart-footer.liquid` — `.cart__blocks.js-contents`; `{% render 'cart-free-shipping-bar' %}` after discount block or before subtotal (see section “Integration: cart drawer and cart page”) |
+| Section used in Cart API `sections` rebuild (drawer) | `sections/cart-notification.liquid` → `cart-notification-children` |
 | Presentation (card, track height, shadows, complete state, responsive, `prefers-reduced-motion`) | `assets/component-cart-notification.css` — search `Free shipping progress` |
 | Fallback strings (EN) | `locales/en.default.json` → `sections.cart.free_shipping_away_html`, `free_shipping_unlocked` |
 
@@ -287,9 +315,13 @@ Inside `snippets/cart-notification-children.liquid`, before totals:
 {% render 'cart-free-shipping-bar' %}
 ```
 
+### Cart page include (location)
+
+Inside `sections/main-cart-footer.liquid`, within `.cart__blocks.js-contents` — after the discount block when present, else before the subtotal block (see comments in that file).
+
 ### Section replacement targets (JS)
 
-From `assets/cart-notification.js`:
+**Drawer** — from `assets/cart-notification.js`:
 
 ```js
 getSectionsToRender() {
@@ -300,13 +332,15 @@ getSectionsToRender() {
 }
 ```
 
+**Cart page** — from `assets/cart.js` (`<cart-items>`): `main-cart-items`, `cart-live-region-text`, `main-cart-footer` (each with `.js-contents` as in `getSectionsToRender()`). Discount flows use the same footer target in `assets/cart-discount.js` → `renderCartPage`.
+
 ---
 
 ## Reuse checklist (other pages / sections)
 
-1. **Snippet:** `{% render 'cart-free-shipping-bar' %}` in any template where `cart` is defined (drawer, cart page, optional inline mini summary if you add one).
-2. **CSS:** Ensure `component-cart-notification.css` is loaded on that layout, or move bar rules to a shared asset if the drawer stylesheet is not loaded.
-3. **AJAX:** If the surface must live-update, add its section ID to every Cart API request that already passes `sections` / `sections_url`, mirroring `product-form.js` / `cart-notification.js`.
+1. **Snippet:** `{% render 'cart-free-shipping-bar' %}` in any template where `cart` is defined (drawer and **cart page footer** are already wired).
+2. **CSS:** Ensure `component-cart-notification.css` is loaded on that layout, or move bar rules to a shared asset if the drawer/cart page stylesheet is not loaded.
+3. **AJAX:** If the surface must live-update, add its section ID to every Cart API request that already passes `sections` / `sections_url`, mirroring `product-form.js` / `cart-notification.js` / **`cart.js`** / **`cart-discount.js`**.
 4. **Locales:** Add or translate `sections.cart.free_shipping_*` in each locale file you ship.
 5. **Consistency:** Keep `free_shipping_threshold` as the only monetary rule in theme settings unless you intentionally split B2B/region logic (would need metafields or markets-aware rules later).
 
@@ -314,10 +348,10 @@ getSectionsToRender() {
 
 ## Testing notes
 
-- Enable the checkbox and set a threshold above and below typical cart totals; add/remove items and change quantities to confirm section HTML refresh updates the bar.
+- Enable the checkbox and set a threshold; exercise **cart drawer** and **full cart page**: quantity changes, remove line, apply/remove discount — confirm bar and subtotal stay aligned.
 - Verify **RTL** storefronts still show sensible bar direction (`direction: ltr` on track).
 - With **discounts**, confirm totals match Shopify’s discounted subtotal expectation for your shipping offer.
 
 ---
 
-*Theme: **Mavon v12** • Shipping bar: reusable snippet, Cart-level theme settings (copy + gradient), locale fallback, card-style drawer UI, and Shopify cart section HTML refresh for updates.*
+*Theme: **Mavon v12** • One snippet for drawer + cart page; Cart-level settings; `main-cart-footer` + `cart.js` / `cart-discount.js` for page updates; locale fallback; card UI.*

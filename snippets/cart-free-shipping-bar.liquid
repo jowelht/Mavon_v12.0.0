@@ -1,7 +1,8 @@
 {% doc %}
   Cart drawer free-shipping progress. Renders when the setting is enabled, the cart has items, and a positive threshold is configured.
   Progress/success copy and bar gradient colors come from theme settings (with locale fallback when messages are blank).
-  Updates automatically whenever cart sections are re-rendered (add to cart, quantity change, discounts).
+  Reused on the cart drawer (`cart-notification-children`) and the cart page (`main-cart-footer` inside `.js-contents`).
+  Updates automatically whenever cart sections are re-rendered (drawer or cart page: line items, discount apply/remove).
 {% enddoc %}
 
 {%- liquid

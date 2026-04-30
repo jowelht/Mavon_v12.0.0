@@ -18,6 +18,9 @@
 {{ 'component-totals.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+{%- if settings.free_shipping_bar_enable -%}
+  {{ 'component-cart-notification.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 
 {%- if theme_rtl -%}
   {{ 'component-cart-items-rtl.css' | asset_url | stylesheet_tag }}
@@ -105,6 +108,11 @@
             {%- endif -%}
 
             <div class="cart__blocks js-contents">
+              {%- comment -%}
+                Same snippet as cart drawer. Placement: after discount block if present, else before subtotal (matches drawer: discount → free shipping → totals).
+                This block is replaced on cart line updates (cart.js) and discount apply/remove (cart-discount.js).
+              {%- endcomment -%}
+              {% assign free_shipping_bar_pending = true %}
               {% for block in section.blocks %}
                 {%- case block.type -%}
                   {%- when '@app' -%}
@@ -114,7 +122,15 @@
                     {% comment %} Cart Discount {% endcomment %}
                     {% render 'cart-discount' %}
                     {% comment %} Cart Discount End {% endcomment %}
+                    {%- if free_shipping_bar_pending -%}
+                      {% render 'cart-free-shipping-bar' %}
+                      {% assign free_shipping_bar_pending = false %}
+                    {%- endif -%}
                   {%- when 'subtotal' -%}
+                    {%- if free_shipping_bar_pending -%}
+                      {% render 'cart-free-shipping-bar' %}
+                      {% assign free_shipping_bar_pending = false %}
+                    {%- endif -%}
                     <div {{ block.shopify_attributes }}>
                       <div class="totals">
                         <h3 class="totals__subtotal h6">{{ 'sections.cart.subtotal' | t }}</h3>
@@ -185,6 +201,9 @@
                     {%- endif -%}
                 {%- endcase -%}
               {% endfor %}
+              {%- if free_shipping_bar_pending -%}
+                {% render 'cart-free-shipping-bar' %}
+              {%- endif -%}
 
               <div id="cart-errors"></div>
             </div>
