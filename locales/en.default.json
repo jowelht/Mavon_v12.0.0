@@ -364,6 +364,8 @@
       "new_subtotal": "New subtotal",
       "note": "Order special instructions",
       "checkout": "Check out",
+      "free_shipping_away_html": "You're {{ amount }} away from free shipping",
+      "free_shipping_unlocked": "You've unlocked free shipping",
       "empty": "Your cart is empty",
       "taxes_and_shipping_policy_at_checkout_html": "Taxes and <a href=\"{{ link }}\">shipping</a> calculated at checkout",
       "taxes_included_but_shipping_at_checkout": "Tax included and shipping calculated at checkout",

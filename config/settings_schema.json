@@ -2040,6 +2040,48 @@
         "id": "continue_shopping_link",
         "label": "Continue shopping button link",
         "default": "/collections/all"
+      },
+      {
+        "type": "header",
+        "content": "Free Shipping Bar"
+      },
+      {
+        "type": "checkbox",
+        "id": "free_shipping_bar_enable",
+        "default": false,
+        "label": "Show progress bar"
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "default": 75,
+        "label": "Free shipping minimum",
+        "info": "Enter the cart total (same currency as your store) needed to qualify for free shipping. For USD and other two-decimal currencies use whole units (75 means $75.00). Uses the cart total after line-item and cart-level discounts."
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_progress_message",
+        "label": "Progress message",
+        "default": "You're {amount} away from Free Shipping",
+        "info": "Use {amount} where the remaining amount should appear (shop currency)."
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_success_message",
+        "label": "Success message",
+        "default": "You've unlocked Free Shipping! 🎉"
+      },
+      {
+        "type": "color",
+        "id": "free_shipping_bar_gradient_start",
+        "label": "Progress bar gradient start",
+        "default": "#121212"
+      },
+      {
+        "type": "color",
+        "id": "free_shipping_bar_gradient_end",
+        "label": "Progress bar gradient end",
+        "default": "#424242"
       }
     ]
   },

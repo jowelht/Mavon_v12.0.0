@@ -1,0 +1,73 @@
+{% doc %}
+  Cart drawer free-shipping progress. Renders when the setting is enabled, the cart has items, and a positive threshold is configured.
+  Progress/success copy and bar gradient colors come from theme settings (with locale fallback when messages are blank).
+  Updates automatically whenever cart sections are re-rendered (add to cart, quantity change, discounts).
+{% enddoc %}
+
+{%- liquid
+  assign threshold_major = settings.free_shipping_threshold | default: 0 | plus: 0
+-%}
+{%- if settings.free_shipping_bar_enable and cart != empty and threshold_major > 0 -%}
+  {%- liquid
+    assign threshold_cents = threshold_major | times: 100
+    assign current_cents = cart.total_price
+    assign remainder_cents = threshold_cents | minus: current_cents
+    if remainder_cents < 0
+      assign remainder_cents = 0
+    endif
+
+    assign reached = false
+    if current_cents >= threshold_cents
+      assign reached = true
+    endif
+
+    assign progress_percent = current_cents | times: 100 | divided_by: threshold_cents
+    if progress_percent > 100
+      assign progress_percent = 100
+    endif
+  -%}
+
+  {%- liquid
+    assign remainder_money = remainder_cents | money
+    if reached
+      assign success_tpl = settings.free_shipping_success_message | strip
+      if success_tpl == blank
+        assign bar_message = 'sections.cart.free_shipping_unlocked' | t
+      else
+        assign bar_message = success_tpl
+      endif
+    else
+      assign progress_tpl = settings.free_shipping_progress_message | strip
+      if progress_tpl == blank
+        assign bar_message = 'sections.cart.free_shipping_away_html' | t: amount: remainder_money
+      else
+        assign bar_message = progress_tpl | replace: '{amount}', remainder_money
+      endif
+    endif
+
+    assign grad_start = settings.free_shipping_bar_gradient_start | default: '#121212'
+    assign grad_end = settings.free_shipping_bar_gradient_end | default: '#424242'
+  -%}
+
+  <div
+    class="free-shipping-progress{% if reached %} free-shipping-progress--complete{% endif %}"
+    data-free-shipping-progress
+    {% if reached %}
+      role="status"
+    {% else %}
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="{{ progress_percent }}"
+      aria-valuetext="{{ bar_message | strip_html }}"
+    {% endif %}
+  >
+    <p class="free-shipping-progress__message caption-large rte">{{ bar_message }}</p>
+    <div class="free-shipping-progress__track" aria-hidden="true">
+      <span
+        class="free-shipping-progress__fill"
+        style="--free-shipping-progress: {{ progress_percent }}%; --free-shipping-gradient-start: {{ grad_start }}; --free-shipping-gradient-end: {{ grad_end }};"
+      ></span>
+    </div>
+  </div>
+{%- endif -%}

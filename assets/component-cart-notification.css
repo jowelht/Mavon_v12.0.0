@@ -474,3 +474,84 @@ details.details.discount-details:not([open]) .cart-discount__summary-icon > .ico
     transform: translateY(0);
   }
 }
+
+/* Free shipping progress (cart drawer) */
+.free-shipping-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+  margin: 0 0 1.6rem;
+  padding: 1.4rem 1.6rem;
+  box-sizing: border-box;
+  border-radius: min(1.2rem, var(--border-radius, 1rem));
+  background: rgba(var(--color-foreground), 0.04);
+  border: 0.1rem solid rgba(var(--color-foreground), 0.08);
+}
+
+.free-shipping-progress__message {
+  margin: 0;
+  padding: 0;
+  color: rgba(var(--color-foreground), 0.88);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+.free-shipping-progress__message:empty {
+  display: none;
+}
+
+.free-shipping-progress__track {
+  direction: ltr;
+  flex-shrink: 0;
+  height: 0.7rem;
+  width: 100%;
+  border-radius: 999px;
+  background: rgba(var(--color-foreground), 0.1);
+  overflow: hidden;
+  box-shadow: inset 0 0.1rem 0.15rem rgba(var(--color-foreground), 0.07);
+}
+
+.free-shipping-progress__fill {
+  display: block;
+  height: 100%;
+  width: var(--free-shipping-progress, 0%);
+  max-width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--free-shipping-gradient-start, rgb(var(--color-button))) 0%,
+    var(--free-shipping-gradient-end, rgb(var(--color-button))) 100%
+  );
+  transform-origin: left center;
+  box-shadow: 0 0.1rem 0.3rem rgba(var(--color-foreground), 0.12);
+  transition: width 0.45s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.free-shipping-progress--complete {
+  background: rgba(var(--color-button), 0.07);
+  border-color: rgba(var(--color-button), 0.18);
+}
+
+.free-shipping-progress--complete .free-shipping-progress__message {
+  color: rgb(var(--color-foreground));
+  font-weight: 600;
+}
+
+.free-shipping-progress--complete .free-shipping-progress__fill {
+  box-shadow: 0 0.12rem 0.35rem rgba(var(--color-button), 0.35);
+}
+
+@media screen and (max-width: 749px) {
+  .free-shipping-progress {
+    padding: 1.2rem 1.4rem;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .free-shipping-progress__fill {
+    transition: none;
+  }
+}
