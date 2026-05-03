@@ -1,0 +1,132 @@
+{%- liquid
+  unless settings.cart_upsell_enable
+    assign show_upsell = false
+  else
+    assign show_upsell = true
+  endunless
+
+  assign limit_n = settings.cart_upsell_products_to_show | default: 3
+  assign cart_ids = ','
+  for item in cart.items
+    assign cart_ids = cart_ids | append: item.product_id | append: ','
+  endfor
+
+  assign render_wrapper = false
+  if show_upsell and cart.items.size > 0
+    assign render_wrapper = true
+  endif
+-%}
+{%- if render_wrapper -%}
+  {%- capture manual_upsell_markup -%}
+    {%- if settings.cart_upsell_source == 'manual' -%}
+      {%- liquid assign manual_shown = 0 -%}
+      {%- if settings.cart_upsell_products.size > 0 -%}
+        {%- for product in settings.cart_upsell_products -%}
+          {%- assign needle = ',' | append: product.id | append: ',' -%}
+          {%- unless cart_ids contains needle -%}
+            {%- if manual_shown < limit_n -%}
+              <div class="swiper-slide cart-drawer-upsell__slide">
+                {% render 'cart-drawer-upsell-product-card', product: product %}
+              </div>
+              {%- assign manual_shown = manual_shown | plus: 1 -%}
+            {%- endif -%}
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- elsif settings.cart_upsell_collection != blank -%}
+        {%- for product in settings.cart_upsell_collection.products -%}
+          {%- assign needle = ',' | append: product.id | append: ',' -%}
+          {%- unless cart_ids contains needle -%}
+            {%- if manual_shown < limit_n -%}
+              <div class="swiper-slide cart-drawer-upsell__slide">
+                {% render 'cart-drawer-upsell-product-card', product: product %}
+              </div>
+              {%- assign manual_shown = manual_shown | plus: 1 -%}
+            {%- endif -%}
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endcapture -%}
+  {%- assign manual_stripped = manual_upsell_markup | strip -%}
+  {%- if settings.cart_upsell_source == 'manual' and manual_stripped == blank -%}
+    {%- assign render_wrapper = false -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- liquid
+  assign upsell_item_total = 0
+  if render_wrapper and settings.cart_upsell_source == 'manual'
+    assign t = 0
+    if settings.cart_upsell_products.size > 0
+      for product in settings.cart_upsell_products
+        assign needle = ',' | append: product.id | append: ','
+        unless cart_ids contains needle
+          if t < limit_n
+            assign t = t | plus: 1
+          endif
+        endunless
+      endfor
+    elsif settings.cart_upsell_collection != blank
+      for product in settings.cart_upsell_collection.products
+        assign needle = ',' | append: product.id | append: ','
+        unless cart_ids contains needle
+          if t < limit_n
+            assign t = t | plus: 1
+          endif
+        endunless
+      endfor
+    endif
+    assign upsell_item_total = t
+  endif
+-%}
+
+{%- if render_wrapper -%}
+  <cart-drawer-upsell
+    class="cart-drawer-upsell"
+    data-source="{{ settings.cart_upsell_source | escape }}"
+    {% if settings.cart_upsell_source == 'automatic' %}
+      data-recommendations-url="{{ routes.product_recommendations_url }}?section_id=cart-drawer-upsell&product_id={{ cart.items.first.product_id }}&limit={{ limit_n | plus: cart.items.size }}&intent=related"
+    {% endif %}
+  >
+    <div class="cart-drawer-upsell__inner">
+      <div class="cart-drawer-upsell__heading-row">
+        {%- if settings.cart_upsell_heading != blank -%}
+          <h3 class="cart-drawer-upsell__heading" id="cart-drawer-upsell-heading">
+            {{ settings.cart_upsell_heading | escape }}
+          </h3>
+        {%- endif -%}
+        <span
+          class="cart-drawer-upsell__counter"
+          data-upsell-counter
+          aria-live="polite"
+          {% if settings.cart_upsell_source == 'automatic' %}
+            hidden
+          {% elsif upsell_item_total < 1 %}
+            hidden
+          {% endif %}
+        >
+          {%- if settings.cart_upsell_source == 'manual' and upsell_item_total > 0 -%}
+            1/{{ upsell_item_total }}
+          {%- endif -%}
+        </span>
+      </div>
+
+      {%- if settings.cart_upsell_source == 'automatic' -%}
+        <div class="cart-drawer-upsell__viewport" data-upsell-viewport>
+          <div class="cart-drawer-upsell__status cart-drawer-upsell__status--loading" data-upsell-loading>
+            <span class="cart-drawer-upsell__spinner"></span>
+          </div>
+          <div class="cart-drawer-upsell__mount" data-upsell-mount hidden></div>
+        </div>
+      {%- else -%}
+        <div class="cart-drawer-upsell__viewport" data-upsell-viewport>
+          <div class="swiper cart-drawer-upsell__swiper" data-cart-drawer-upsell-swiper>
+            <div class="swiper-wrapper">
+              {{ manual_upsell_markup }}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </cart-drawer-upsell>
+{%- endif -%}

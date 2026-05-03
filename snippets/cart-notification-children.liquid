@@ -32,6 +32,8 @@
   </form>
 </div>
 
+{% render 'cart-drawer-upsell' %}
+
 <div class="cart-notification__links {% if cart == empty %} no-js-inline {% endif %}" id="empty__cart__button">
   {%- if settings.cart_note_enable or settings.shipping_calc_enable -%}
     <div class="cart_notification_footer d-flex justify-content-between">

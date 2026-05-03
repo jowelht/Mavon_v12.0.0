@@ -1,0 +1,39 @@
+{%- comment -%}
+  Rendered only via the Product Recommendations API (`section_id=cart-drawer-upsell`).
+  Do not add this section to JSON templates.
+{%- endcomment -%}
+{%- liquid
+  assign limit_n = settings.cart_upsell_products_to_show | default: 3
+  assign cart_ids = ','
+  for item in cart.items
+    assign cart_ids = cart_ids | append: item.product_id | append: ','
+  endfor
+-%}
+{%- if recommendations.performed and recommendations.products_count > 0 -%}
+  <div class="shopify-section cart-drawer-upsell-section-api">
+    <div
+      grid-recommendation
+      class="cart-drawer-upsell__fragment-root"
+    >
+      {%- assign shown = 0 -%}
+      {%- for product in recommendations.products -%}
+        {%- assign needle = ',' | append: product.id | append: ',' -%}
+        {%- unless cart_ids contains needle -%}
+          {%- if shown < limit_n -%}
+            <div class="swiper-slide cart-drawer-upsell__slide">
+              {% render 'cart-drawer-upsell-product-card', product: product %}
+            </div>
+            {%- assign shown = shown | plus: 1 -%}
+          {%- endif -%}
+        {%- endunless -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Cart drawer upsell",
+  "settings": []
+}
+{% endschema %}

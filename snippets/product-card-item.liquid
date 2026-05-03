@@ -42,9 +42,10 @@
       assign price_class = 'product-grid-item__price justify-content-center'
   endcase
 
-  unless card_settings.show_cart_icon_mobile
+  assign car_icon_mobile = ''
+  if card_settings != blank and card_settings.show_cart_icon_mobile == false
     assign car_icon_mobile = 'd-sm-none'
-  endunless
+  endif
 
   case cart_button_place
     when 'top_left', 'bottom_left'

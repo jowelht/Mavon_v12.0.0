@@ -27,7 +27,7 @@ Rendering is **server-side Liquid** inside a single reusable snippet (`cart-free
 | Cart drawer DOM shell | `snippets/cart-notification.liquid` |
 | Section file (minimal) | `sections/cart-notification.liquid` |
 | Styles (scoped BEM-ish classes) | `assets/component-cart-notification.css` |
-| Theme settings (enable, threshold, messages, gradient) | `config/settings_schema.json` → group **Cart** → header **Free Shipping Bar** (all `free_shipping_*` IDs) |
+| Theme settings (enable, threshold, messages, gradient) | `config/settings_schema.json` → group **Cart** → header **Free shipping bar** (all `free_shipping_*` IDs) |
 | Copy (EN) | `locales/en.default.json` → `sections.cart.*` |
 | Stylesheet load (bar CSS) | If `settings.free_shipping_bar_enable`: `sections/main-cart-footer.liquid`; cart **drawer** also loads via discount UI / header. Bar styles: `assets/component-cart-notification.css` |
 | Cart AJAX: section replacement | Drawer: `assets/cart-notification.js`, `assets/product-form.js`. Cart **page**: `assets/cart.js`, `assets/cart-discount.js` (both replace `main-cart-footer` `.js-contents`) |
@@ -71,7 +71,7 @@ Under `sections.cart` in `locales/en.default.json` (mirror keys in other locale 
 - `free_shipping_away_html` — includes `{{ amount }}` (formatted with `money` filter in Liquid).
 - `free_shipping_unlocked` — shown when the threshold is met.
 
-**Theme settings override:** If **Progress message** or **Success message** in the Cart → Free Shipping Bar settings are non-empty, those strings are used instead. Progress copy must include the literal placeholder `{amount}` (curly braces) where the remaining total should appear; the value is inserted with the same `money` formatting as before.
+**Theme settings override:** If **Progress message** or **Success message** in the Cart → Free shipping bar settings are non-empty, those strings are used instead. Progress copy must include the literal placeholder `{amount}` (curly braces) where the remaining total should appear; the value is inserted with the same `money` formatting as before.
 
 ---
 
@@ -169,13 +169,13 @@ Because `cart-notification-children` contains `{% render 'cart-free-shipping-bar
 
 ### Merchant controls (Shopify Admin → Theme settings)
 
-Located in **`config/settings_schema.json`** inside the **Cart** settings group (after cart type and drawer options such as continue shopping). A sub-header **Free Shipping Bar** introduces:
+Located in **`config/settings_schema.json`** inside the **Cart** settings group (after cart type and drawer options such as continue shopping). A sub-header **Free shipping bar** introduces:
 
 | Setting ID | Type | Label in customizer | Purpose |
 |------------|------|---------------------|---------|
 | `free_shipping_bar_enable` | checkbox | Show progress bar | Turns the bar on/off (default: `false`) |
 | `free_shipping_threshold` | number | Free shipping minimum | Minimum cart total in **major currency units** (schema default example: `75`) |
-| `free_shipping_progress_message` | text | Progress message | Default e.g. `You're {amount} away from Free Shipping`; use `{amount}` for the remainder |
+| `free_shipping_progress_message` | text | Progress message | Default e.g. `You're {amount} away from free shipping`; use `{amount}` for the remainder |
 | `free_shipping_success_message` | text | Success message | Default e.g. unlocked line with emoji; shown at 100% |
 | `free_shipping_bar_gradient_start` | color | Progress bar gradient start | Left side of fill gradient |
 | `free_shipping_bar_gradient_end` | color | Progress bar gradient end | Right side of fill gradient |
@@ -184,7 +184,7 @@ The schema `info` on `free_shipping_threshold` describes two-decimal currencies 
 
 ### Text
 
-**Primary:** edit **Progress message** and **Success message** under Cart → Free Shipping Bar (supports `{amount}` in the progress string).
+**Primary:** edit **Progress message** and **Success message** under Cart → Free shipping bar (supports `{amount}` in the progress string).
 
 **Fallback:** translation keys under `sections.cart` when those fields are left blank:
 
@@ -222,7 +222,7 @@ Single overview of the **shipped implementation** for anyone extending or debugg
 
 | Concern | Location |
 |--------|----------|
-| Schema: enable, threshold, progress/success copy, gradient colors | `config/settings_schema.json` (**Cart** → **Free Shipping Bar**) |
+| Schema: enable, threshold, progress/success copy, gradient colors | `config/settings_schema.json` (**Cart** → **Free shipping bar**) |
 | Threshold math, `reached`, `%`, messages, gradient hex → CSS vars | `snippets/cart-free-shipping-bar.liquid` |
 | Drawer injection order | `snippets/cart-notification-children.liquid` — inside `#cart--drawer--footer`, **above** subtotal |
 | Cart **page** injection | `sections/main-cart-footer.liquid` — `.cart__blocks.js-contents`; `{% render 'cart-free-shipping-bar' %}` after discount block or before subtotal (see section “Integration: cart drawer and cart page”) |
@@ -232,7 +232,7 @@ Single overview of the **shipped implementation** for anyone extending or debugg
 
 ### Theme setting IDs (complete list)
 
-In the customizer these sit under **Theme settings → Cart** after the **Free Shipping Bar** header:
+In the customizer these sit under **Theme settings → Cart** after the **Free shipping bar** header:
 
 | ID | Customizer label (typical) |
 |----|----------------------------|

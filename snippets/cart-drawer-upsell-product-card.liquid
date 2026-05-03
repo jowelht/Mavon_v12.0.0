@@ -1,0 +1,100 @@
+{%- comment -%}
+  Compact upsell row for the cart drawer (not full product-grid-item).
+{%- endcomment -%}
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign product_form_id = 'cart-drawer-upsell-' | append: product.id
+  assign qty_rules = false
+  if variant.quantity_rule.min > 1 or variant.quantity_rule.max != null or variant.quantity_rule.increment > 1
+    assign qty_rules = true
+  endif
+  assign price_class = 'cart-drawer-upsell-compact__price-el'
+-%}
+<div class="cart-drawer-upsell-compact">
+  <a
+    href="{{ product.url }}"
+    class="cart-drawer-upsell-compact__media"
+  >
+    {%- if product.featured_media -%}
+      <img
+        class="cart-drawer-upsell-compact__img"
+        src="{{ product.featured_media | image_url: width: 168 }}"
+        alt="{{ product.featured_media.alt | escape }}"
+        width="72"
+        height="72"
+        loading="lazy"
+      >
+    {%- else -%}
+      <span class="cart-drawer-upsell-compact__img cart-drawer-upsell-compact__img--placeholder">
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </span>
+    {%- endif -%}
+  </a>
+
+  <div class="cart-drawer-upsell-compact__body">
+    {%- if settings.show_vendor_cart_drawer and product.vendor != blank -%}
+      <p class="cart-drawer-upsell-compact__vendor">{{ product.vendor | escape }}</p>
+    {%- endif -%}
+    <a href="{{ product.url }}" class="cart-drawer-upsell-compact__title">
+      {{- product.title | escape -}}
+    </a>
+    <div class="cart-drawer-upsell-compact__price-wrap">
+      {% render 'price', product: product, use_variant: true, price_class: price_class %}
+    </div>
+  </div>
+
+  <div class="cart-drawer-upsell-compact__action">
+    {%- if product.variants.size > 1 or qty_rules -%}
+      {% render 'quick-view',
+        product_card_product: product,
+        variant: variant,
+        car_icon_mobile: '',
+        cart_button_style: 'style2',
+        product_form_id: product_form_id,
+        section_id: section.id
+      %}
+    {%- else -%}
+      <product-form data-section-id="{{ section.id }}">
+        {%- form 'product',
+          product,
+          id: product_form_id,
+          class: 'form cart-drawer-upsell-compact__form',
+          novalidate: 'novalidate',
+          data-type: 'add-to-cart-form'
+        -%}
+          <input
+            type="hidden"
+            name="id"
+            value="{{ variant.id }}"
+            class="product-variant-id"
+            {% if variant.available == false %}
+              disabled
+            {% endif %}
+          >
+          <button
+            id="{{ product_form_id }}-submit"
+            type="submit"
+            name="add"
+            class="cart-drawer-upsell-compact__add cart--icon-button button--icon"
+            aria-haspopup="dialog"
+            aria-labelledby="{{ product_form_id }}-submit title-cart-upsell-{{ product.id }}"
+            aria-live="polite"
+            data-sold-out-message="true"
+            {% if variant.available == false %}
+              disabled
+            {% endif %}
+          >
+            {%- if variant.available -%}
+              <span class="visually-hidden">{{ 'products.product.add_to_cart' | t }}</span>
+              {%- render 'cart-icon' -%}
+            {%- else -%}
+              <span class="visually-hidden">{{ 'products.product.sold_out' | t }}</span>
+              {%- render 'cart-icon' -%}
+            {%- endif -%}
+          </button>
+        {%- endform -%}
+      </product-form>
+    {%- endif -%}
+  </div>
+  <span id="title-cart-upsell-{{ product.id }}" class="visually-hidden">{{ product.title | escape }}</span>
+</div>

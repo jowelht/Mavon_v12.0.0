@@ -1,4 +1,42 @@
 /* Custom css */
+/* Cart drawer flex: keep line items scrollable when upsell + footer share the column */
+#cart-notification.cart-notification > .cart_notification_topbar {
+  flex-shrink: 0;
+}
+
+#cart-notification.cart-notification > #min-cart-items {
+  flex: 1 1 auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+#cart-notification.cart-notification > .cart-drawer-upsell {
+  flex-shrink: 0;
+}
+
+#cart-notification.cart-notification > .cart-notification__links {
+  flex-shrink: 0;
+}
+
+/* Custom element + column layout so the scroll area can shrink inside the fixed drawer */
+cart-notification#offcanvas__mini_cart {
+  display: flex;
+  flex-direction: column;
+}
+
+#offcanvas__mini_cart .cart-notification-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#cart-notification.cart-notification.d-flex.flex-direction-column {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+}
+
 #offcanvas__mini_cart.active {
   transform: translateX(0);
   opacity: 1;
